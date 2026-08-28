@@ -1,0 +1,31 @@
+{
+  "checkedAt": "2026-08-28T11:13:25.684Z",
+  "commit": "bfb7fea",
+  "routes": {
+    "root": 200,
+    "demo": 200,
+    "privacy": 200,
+    "terms": 200,
+    "unknown": 404
+  },
+  "demo": {
+    "initialDifferences": 5,
+    "editedDifferences": 0,
+    "resetDifferences": 5,
+    "banner": true,
+    "discarded": true
+  },
+  "privacy": {
+    "sameOriginOnly": true,
+    "storage": {
+      "cookies": "",
+      "local": 0,
+      "session": 0,
+      "dbs": 0
+    }
+  },
+  "offlineReload": true,
+  "mobileFirstScreen": true,
+  "focus": true,
+  "consoleErrorsOnValidRoutes": []
+}

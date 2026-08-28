@@ -1,74 +1,80 @@
-# Release Env Fingerprint repair handoff
+# Release Env Fingerprint — polish round 1 handoff
 
 ## Outcome
 
-Repair round 1 resolves B1–B4 from review-1 while keeping the risograph proof
-sheet visual system. The landing screen now names engineers shipping one
-service across environments, uses Try it with sample data as its primary
-action, and says that the click shows five differences.
+All findings in `.factory/review-1.md` are resolved. The implementation repair
+is commit `bfb7fea` on `main` and is deployed at:
 
-Repair implementation commit: 0df472d85e270f2af21273c57186db6e3446999d.
-Published-package sample repair: ef3761ef6fa904513227799b6cde05b9e935ead2.
+<https://release-env-fingerprint.sociobot.in>
 
-The browser sandbox is available at /?demo=1 and /demo. It immediately renders
-the sample result, has the persistent Demo — sample data, nothing is saved
-banner, Reset demo, and Start for real. It uses no browser storage. The CLI now
-ships examples and implements refp demo with a new temporary workspace and the
-real capture/compare flow.
+The risograph proof-sheet visual system is preserved. The landing screen now
+states the job, user, first action, action result, and three tested facts. On a
+390 × 844 viewport, all of that appears above the fold.
 
-The static site has browser-routed /demo, /privacy, /terms, and designed 404
-experiences; per-route title, description, canonical, focus/announcement,
-legal links, sitemap entries, social card, apple icon, and platform 404
-response override are present.
+The browser sample at `/?demo=1` and `/demo` is a dedicated DOM-only sandbox.
+It opens with five computed differences, not canned output. It has a persistent
+banner, Reset demo, and Start for real. Edits change the result, reset restores
+the sample, and leaving discards edits. `refp demo` uses the real capture,
+signature verification, and comparison code in a new OS temporary directory.
 
-## Verification
+The site now builds real Demo, Privacy, and Terms documents with route-specific
+metadata. Unknown paths return the designed proof-sheet 404 with HTTP 404.
+Route changes focus and announce the h1; Back restores focus and scroll.
 
-Run in this repair workspace:
+## Claims
+
+`.factory/claims.json` contains 17 unique promises. Each has exactly one
+`@claim:<id>` branch in `site/claims.mjs`. `npm test` runs all claim tests.
+Coverage includes:
+
+- all four difference classes and exit 2;
+- signature tamper rejection and raw-value absence;
+- exact/prefix/host rules and project-keyed approved-value hashes;
+- real browser sample output, reset, discard, privacy, and offline reload;
+- real CLI demo isolation and one-document JSON output;
+- direct command execution without shell expansion;
+- fresh-root CLI installation and both release build artifacts.
+
+## Verification evidence
+
+Working tree and clean clone both passed:
 
     npm ci
     npm test
     npm run lint
     npm run build
-    cargo package --manifest-path cli/Cargo.toml --allow-dirty
+    cargo package --manifest-path cli/Cargo.toml
 
-Results:
+Clean clone: `/tmp/refp-polish-clean-zoxDCf/repo` at `bfb7fea`.
 
-- npm test passed: TypeScript, 6 Rust tests, Vite/static budgets, browser
-  routes/demo/mobile/privacy/offline/keyboard/console checks, and Playwright
-  axe serious/critical check.
-- Initial assets: JavaScript 14,273 B, CSS 15,986 B, hero 178,612 B.
-- All ten registered claim commands passed:
-  sample-differences, signed-fingerprints, no-raw-values,
-  browser-demo-private, offline-reload, mit-license, cli-demo-isolated,
-  exit-2-difference, policy-rules, and approved-value-hashes.
-- npm run lint passed with rustfmt and clippy warnings denied.
-- npm run build completed with target/release/refp and dist/site.
-- cargo package completed with allow-dirty for the release-ready package check.
-- A fresh shallow clone of pushed main ran npm ci and npm test successfully.
-- verify-url.sh against the local preview returned HTTP 200 with no console
-  errors, title, lang, one h1, main landmark, and no missing image alt.
-- Playwright axe integration found no serious or critical violations. The
-  standalone axe CLI was also invoked but its Selenium runner could not locate
-  a Chrome binary in this container; this is an environment limitation, not a
-  product failure.
+Measured results:
 
-## Demo and claims
+- Rust: 8 unit tests and 4 CLI integration tests passed.
+- Claims: all 17 tagged commands passed from the clean clone.
+- Browser: first screen, computed demo, routes/status, focus/history, 390/640/
+  1440 px bounds, privacy, offline, reduced motion, console, and axe passed.
+- Built assets: 17,157 B JS; 17,634 B CSS; 178,612 B hero image.
+- Standalone axe 4.10.3: 0 violations on live `/`, `/?demo=1`, `/privacy`,
+  and `/terms`.
+- Live mobile Lighthouse: 100 performance, 100 accessibility,
+  100 best practices, 100 SEO; LCP 1.7 s, CLS 0, TBT 60 ms.
+- `verify-url.sh` on the live root: HTTP 200, zero console errors, title,
+  `lang=en`, one h1, main landmark, alt text, and labeled buttons passed.
+- Live cold Playwright: valid routes returned 200, unknown returned 404,
+  demo 5 → edited 0 → reset 5, sentinel discarded, empty browser storage,
+  same-origin requests only, offline reload passed, valid-route console clean.
 
-See .factory/demo.md for sandbox behavior and .factory/claims.json for the
-one-test-per-claim commands. The browser privacy test checks same-origin
-requests plus cookies, localStorage, sessionStorage, and IndexedDB from a
-fresh context. The offline claim starts fresh, installs the service worker,
-then reloads offline and observes the completed sample comparison.
+Evidence files are in `.factory/evidence/polish-1/`. The per-finding map is
+`.factory/polish-1.md`.
 
-## Release and deployment
+## Deployment
 
-The static deployment artifact is dist/site. Push the repair commit on main;
-the work order static deployment consumes that artifact configuration. No
-secrets, DNS, billing, package publishing, or other infrastructure was
-changed.
+The work-order build output is `dist/site`. It was uploaded to the existing
+Azure Static Web App production environment after `bfb7fea` was pushed. No
+DNS, billing, secrets, or package registry settings were changed. The custom
+domain and managed TLS were re-used.
 
-## Known gaps
+## Known gaps and next steps
 
-None in the product acceptance scope. The CLI demo leaves its temporary sample
-directory in place intentionally and prints its exact path so the visitor can
-inspect or remove it.
+None in the acceptance scope. Do not publish the Rust package from this worker;
+the factory owns registry credentials.
