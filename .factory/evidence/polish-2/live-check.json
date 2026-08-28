@@ -1,0 +1,84 @@
+{
+  "checkedAt": "2026-08-28T12:22:19.143Z",
+  "origin": "https://release-env-fingerprint.sociobot.in",
+  "routes": {
+    "/": {
+      "status": 200,
+      "title": "Release Env Fingerprint — compare release settings",
+      "socialMetadata": true
+    },
+    "/demo": {
+      "status": 200,
+      "title": "Demo — Release Env Fingerprint",
+      "socialMetadata": true
+    },
+    "/privacy": {
+      "status": 200,
+      "title": "Privacy — Release Env Fingerprint",
+      "socialMetadata": true
+    },
+    "/terms": {
+      "status": 200,
+      "title": "Terms — Release Env Fingerprint",
+      "socialMetadata": true
+    },
+    "/missing-polish-2": {
+      "status": 404,
+      "title": "Page not found — Release Env Fingerprint",
+      "socialMetadata": true
+    }
+  },
+  "viewports": {
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "factBottom": 801.9375,
+      "resultBottom": 817.4461059570312,
+      "noOverflow": true
+    },
+    "desktop": {
+      "width": 1440,
+      "height": 900,
+      "factBottom": 891.84375,
+      "resultBottom": 846.5,
+      "noOverflow": true
+    }
+  },
+  "demo": {
+    "computedRows": 5,
+    "editedRows": 6,
+    "matchingState": true,
+    "reset": true,
+    "discard": true,
+    "focusOnRoute": true
+  },
+  "privacy": {
+    "storage": {
+      "cookies": "",
+      "localStorage": 0,
+      "sessionStorage": 0,
+      "indexedDB": 0
+    },
+    "requests": [
+      "/",
+      "/assets/index-DP-9f6nJ.js",
+      "/assets/style-BjrfKnGu.css",
+      "/proof-sheet.webp",
+      "/refp-demo.svg"
+    ],
+    "sameOriginOnly": true,
+    "compareRequests": 0
+  },
+  "offline": {
+    "notice": true,
+    "computedRows": 5
+  },
+  "assets": {
+    "terminalRecording": {
+      "status": 200,
+      "sha256": "eb5b7cdbbfde4cdfc236c487b6ef7c59850b708ea2288c553dfbd89c7d12675c",
+      "matchesSource": true
+    }
+  },
+  "consoleErrors": []
+}

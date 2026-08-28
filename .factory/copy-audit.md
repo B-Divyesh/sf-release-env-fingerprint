@@ -40,7 +40,8 @@ and navigation labels are excluded from sentence counts. No sentence exceeds
 | 7 | Compare production with a candidate release. | `sample-differences` |
 | 6 | The five differences are computed below. | `sample-differences` |
 | 7 | Edit either environment to test another release. | Instruction |
-| 6 | You are offline after the first visit. | `offline-reload` |
+| 3 | You are offline. | Offline state |
+| 6 | Works offline after the first visit. | `offline-reload` |
 | 4 | Edit the sample environments. | Instruction |
 | 8 | Compare variable names, types, and values marked non-secret. | `detect-config-differences` |
 | 7 | Sample data stays in this page. | `browser-demo-private` |
