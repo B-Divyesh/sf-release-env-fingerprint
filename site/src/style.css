@@ -49,15 +49,16 @@ button, a { -webkit-tap-highlight-color: transparent; }
   justify-content: space-between;
   border-bottom: 2px solid var(--ink);
 }
-.brand { display: flex; gap: 10px; align-items: center; color: var(--ink); text-decoration: none; font-family: var(--display); font-size: 19px; letter-spacing: 0.08em; }
+.brand { min-height: 44px; display: flex; gap: 10px; align-items: center; color: var(--ink); text-decoration: none; font-family: var(--display); font-size: 19px; letter-spacing: 0.08em; }
 .brand small { font-family: var(--mono); font-size: 11px; color: var(--muted); border: 1px solid var(--muted); padding: 1px 4px; }
 .site-header nav { display: flex; align-items: center; gap: 28px; }
 .site-header nav a { color: var(--ink); font-size: 14px; text-decoration: none; }
 .site-header nav a:hover { text-decoration: underline; }
 .site-header .nav-install { background: var(--ink); color: var(--paper-high); padding: 10px 16px; border: 2px solid var(--ink); }
 
-main { overflow: hidden; }
+main { overflow-x: clip; }
 .hero { max-width: 1180px; margin: auto; min-height: 680px; padding: 80px 24px 72px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(420px, 0.92fr); gap: 68px; align-items: center; }
+.hero > *, .hero-copy, .hero-actions, .final-cta > * { min-width: 0; }
 .eyebrow { margin: 0 0 20px; color: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
 .eyebrow span { display: inline-block; margin-right: 10px; padding: 4px 7px; color: var(--paper-high); background: var(--ink); }
 h1, h2, h3 { margin: 0; font-family: var(--display); line-height: 1.02; letter-spacing: -0.035em; }
@@ -67,9 +68,9 @@ h2 { font-size: clamp(36px, 4.4vw, 58px); text-transform: uppercase; }
 h3 { font-size: 25px; text-transform: uppercase; }
 .lede { max-width: 61ch; margin: 26px 0 30px; font-size: 18px; color: #343631; }
 .hero-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
-.command-box { width: min(100%, 500px); min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-left: 16px; border: 2px solid var(--ink); background: var(--paper-high); box-shadow: 6px 6px 0 var(--ink); }
-.command-box code { overflow-x: auto; white-space: nowrap; font-size: 14px; }
-.copy-button { align-self: stretch; min-width: 88px; min-height: 52px; border: 0; border-left: 2px solid var(--ink); color: var(--paper-high); background: var(--blue); cursor: pointer; font-weight: 700; }
+.command-box { width: 100%; max-width: 500px; min-width: 0; min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-left: 16px; border: 2px solid var(--ink); background: var(--paper-high); box-shadow: 6px 6px 0 var(--ink); }
+.command-box code { min-width: 0; flex: 1 1 auto; overflow-x: auto; white-space: nowrap; font-size: 14px; }
+.copy-button { flex: 0 0 auto; align-self: stretch; min-width: 88px; min-height: 52px; border: 0; border-left: 2px solid var(--ink); color: var(--paper-high); background: var(--blue); cursor: pointer; font-weight: 700; }
 .copy-button:active, .primary-button:active, .secondary-button:active { transform: translateY(1px); }
 .text-link { min-height: 44px; display: inline-flex; align-items: center; font-weight: 700; }
 .proof-points { display: flex; flex-wrap: wrap; gap: 18px; padding: 0; margin: 32px 0 0; list-style: none; color: var(--muted); font-size: 13px; text-transform: uppercase; }
@@ -178,8 +179,8 @@ textarea { width: 100%; min-height: 234px; resize: vertical; display: block; pad
 footer { padding: 52px max(24px, calc((100vw - 1132px) / 2)); display: grid; grid-template-columns: 1fr auto; gap: 14px 48px; color: #d9d4c5; background: var(--ink); font-size: 13px; }
 .footer-brand { display: flex; flex-direction: column; }
 .footer-brand strong { color: var(--paper-high); font-family: var(--display); font-size: 18px; text-transform: uppercase; }
-footer nav { display: flex; gap: 24px; }
-footer a { color: var(--paper-high); }
+footer nav { display: flex; gap: 16px; }
+footer a { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; color: var(--paper-high); }
 footer p { max-width: 70ch; margin: 0; }
 footer > p:last-child { grid-column: 2; grid-row: 2; }
 

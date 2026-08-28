@@ -117,12 +117,16 @@ executed directly, without a shell, which keeps the approval boundary visible.
 Requirements: Rust 1.79+ and Node.js 20+.
 
 ```sh
-npm install
+npm ci
 npm test
+npm run typecheck
+npm run lint
 npm run build
 ```
 
-`npm test` runs the Rust unit/integration tests and the site checks.
+`npm test` runs TypeScript checking, Rust unit/integration tests, static site
+budgets, and the browser regression suite (including mobile bounds and a cold
+offline reload after the browser HTTP cache is cleared).
 `npm run build` builds the release CLI and the static site. The deployable site
 is written to `dist/site/` with `index.html` at that root. For local site work:
 

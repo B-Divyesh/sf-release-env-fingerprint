@@ -85,6 +85,7 @@ function addResult(list: HTMLElement, state: string, symbol: string, name: strin
 }
 
 function compareInputs(): void {
+  const restoreFocus = document.activeElement === compareButton;
   compareButton.disabled = true;
   compareButton.textContent = 'Comparing…';
   requestAnimationFrame(() => {
@@ -127,6 +128,7 @@ function compareInputs(): void {
     } finally {
       compareButton.disabled = false;
       compareButton.textContent = 'Compare fingerprints';
+      if (restoreFocus) compareButton.focus({ preventScroll: true });
     }
   });
 }
