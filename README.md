@@ -15,12 +15,14 @@ Live documentation: <https://release-env-fingerprint.sociobot.in>
 
 ## Install
 
-Build the single Rust binary from source:
+Install the single Rust binary directly from the repository:
 
 ```sh
-cargo install --path cli
+cargo install --git https://github.com/B-Divyesh/sf-release-env-fingerprint --bin refp
 refp --help
 ```
+
+From a local clone, use `cargo install --path cli` instead.
 
 The first tagged release will also publish prebuilt binaries. No registry
 package is published by this repository worker.
