@@ -1,6 +1,7 @@
-node_modules/
-dist/
-.env
-*.log
-graphify-out/
-.DS_Store
+/target/
+/node_modules/
+/dist/
+/.refp-key
+*.refp.json
+site/public/proof-sheet-source.png
+site/public/proof-sheet-source.png.json

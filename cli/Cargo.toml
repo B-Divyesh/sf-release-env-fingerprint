@@ -1,0 +1,31 @@
+[package]
+name = "release-env-fingerprint"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.79"
+description = "Signed release-environment shape checks without persisting secrets"
+license = "MIT"
+repository = "https://github.com/B-Divyesh/sf-release-env-fingerprint"
+readme = "../README.md"
+keywords = ["environment", "configuration", "ci", "security", "devtools"]
+categories = ["command-line-utilities", "development-tools"]
+exclude = ["tests/fixtures/*"]
+
+[[bin]]
+name = "refp"
+path = "src/main.rs"
+
+[dependencies]
+base64 = "0.22"
+chrono = { version = "0.4", default-features = false, features = ["clock", "serde"] }
+clap = { version = "4.5", features = ["derive"] }
+hmac = "0.12"
+rand = "0.8"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+toml = "0.8"
+url = "2.5"
+
+[dev-dependencies]
+tempfile = "3"
