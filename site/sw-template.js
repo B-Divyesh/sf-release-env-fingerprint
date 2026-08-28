@@ -19,11 +19,11 @@ async function networkFirst(request) {
     const response = await fetch(request);
     if (response.ok) {
       const cache = await caches.open(CACHE);
-      await cache.put('/', response.clone());
+      await cache.put(request, response.clone());
     }
     return response;
   } catch {
-    return caches.match('/');
+    return (await caches.match(request, { ignoreSearch: false })) || caches.match('/');
   }
 }
 

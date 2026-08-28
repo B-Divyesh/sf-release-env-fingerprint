@@ -78,3 +78,12 @@ it is the only above-fold image and is capped below 300 KB. Halftone texture is
 decorative and never carries information. Controls are at least 44 px, status
 labels include symbols plus words, and the document preserves one `h1`, ordered
 headings, landmarks, a skip link, and visible focus.
+
+## Polish round 1
+
+The visual thesis remains unchanged. On phones, the proof-sheet image yields
+to the job statement, sample action, and three facts so the first screen stays
+decisive. The sample uses a sticky ochre proof label as its persistent demo
+boundary. Real legal and error routes reuse the paper, press rules,
+registration-shadow layers, and display/mono pairing. No new image asset or
+third-party material was introduced.

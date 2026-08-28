@@ -1,1 +1,1 @@
-Compare release configuration without exposing secrets before deployment.
+Compare release settings across environments without recording raw values.

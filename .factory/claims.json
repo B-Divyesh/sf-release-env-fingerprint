@@ -1,72 +1,121 @@
 [
   {
+    "id": "detect-config-differences",
+    "claim": "The CLI finds missing, extra, type, and approved non-secret value differences.",
+    "where": "landing first screen, workflow, README",
+    "test": "npm run test:claims -- @claim:detect-config-differences",
+    "sandbox": "Rust fixture creates two fingerprints and asserts every difference class"
+  },
+  {
     "id": "sample-differences",
-    "claim": "The sample shows five configuration differences.",
-    "where": "landing action, demo",
+    "claim": "The one-click browser sample immediately shows five real differences.",
+    "where": "landing action, browser demo",
     "test": "npm run test:claims -- @claim:sample-differences",
-    "sandbox": "fresh CLI process running refp demo with shipped examples"
+    "sandbox": "fresh browser context opens ?demo=1, checks five named rows, then checks edited inputs change the result"
   },
   {
     "id": "signed-fingerprints",
-    "claim": "Fingerprints are signed.",
-    "where": "README",
+    "claim": "Each fingerprint is signed and tampering is rejected.",
+    "where": "workflow, README",
     "test": "npm run test:claims -- @claim:signed-fingerprints",
-    "sandbox": "tamper a captured fingerprint and verify rejection"
+    "sandbox": "create and verify a fingerprint, change its environment label, and assert verification fails"
   },
   {
     "id": "no-raw-values",
     "claim": "Fingerprints do not record raw environment values.",
-    "where": "README, workflow",
+    "where": "landing, workflow, privacy, README",
     "test": "npm run test:claims -- @claim:no-raw-values",
-    "sandbox": "capture sentinel secrets and scan the fingerprint"
+    "sandbox": "capture sentinel secrets and recursively scan both fingerprints and process output"
   },
   {
     "id": "browser-demo-private",
-    "claim": "Demo sample data is not saved or sent to another origin.",
+    "claim": "The site has no analytics or third-party requests, and browser demo edits are not saved.",
     "where": "landing fact, demo banner, privacy",
     "test": "npm run test:claims -- @claim:browser-demo-private",
-    "sandbox": "fresh browser context; inspect requests, cookies, local/session storage, and IndexedDB"
+    "sandbox": "fresh browser context edits sentinel data; assert an allowlisted request set, empty cookies/storage/databases, and discard on exit"
   },
   {
     "id": "offline-reload",
-    "claim": "Works offline after the first visit.",
-    "where": "landing fact, offline notice",
+    "claim": "The browser sample works offline after the first visit.",
+    "where": "landing fact, demo offline notice, README",
     "test": "npm run test:claims -- @claim:offline-reload",
-    "sandbox": "fresh browser context; first visit, service worker control, offline reload, sample result"
+    "sandbox": "fresh browser context installs the service worker, switches offline, reloads ?demo=1, and observes five differences"
   },
   {
     "id": "mit-license",
-    "claim": "Free under the MIT License.",
-    "where": "landing fact, terms",
+    "claim": "Release Env Fingerprint is free under the MIT License.",
+    "where": "landing fact, terms, README",
     "test": "npm run test:claims -- @claim:mit-license",
-    "sandbox": "inspect the shipped LICENSE file"
+    "sandbox": "inspect the shipped LICENSE and deployed LICENSE.txt"
   },
   {
     "id": "cli-demo-isolated",
-    "claim": "refp demo creates an isolated temporary sample workspace.",
-    "where": "README, CLI sample section, demo documentation",
+    "claim": "refp demo creates a temporary sample workspace without reading or writing project files.",
+    "where": "CLI sample section, README, demo documentation",
     "test": "npm run test:claims -- @claim:cli-demo-isolated",
-    "sandbox": "fresh CLI process; inspect printed temporary directory and isolation notice"
+    "sandbox": "run from a watched empty directory; verify it remains empty and inspect six files under the printed OS temp path"
   },
   {
     "id": "exit-2-difference",
-    "claim": "The CLI exits 2 when fingerprints differ.",
+    "claim": "The CLI exits 2 when the sample fingerprints differ.",
     "where": "workflow, README",
     "test": "npm run test:claims -- @claim:exit-2-difference",
-    "sandbox": "run the shipped sample with known differences"
+    "sandbox": "run refp demo and assert exit 2 plus a parsed five-difference report"
   },
   {
-    "id": "policy-rules",
-    "claim": "The policy enforces required variables and host rules.",
+    "id": "required-rules",
+    "claim": "The policy enforces exact required variable names and required prefixes.",
     "where": "configuration policy section",
-    "test": "npm run test:claims -- @claim:policy-rules",
-    "sandbox": "unit fixture with a missing required name and disallowed host"
+    "test": "npm run test:claims -- @claim:required-rules",
+    "sandbox": "Rust fixture omits both requirements and asserts both rule failures"
+  },
+  {
+    "id": "host-rules",
+    "claim": "The policy accepts exact and approved subdomain hosts without recording full URLs.",
+    "where": "README",
+    "test": "npm run test:claims -- @claim:host-rules",
+    "sandbox": "Rust matrix checks exact, subdomain, bare suffix, sibling, and lookalike hosts and scans fingerprints"
   },
   {
     "id": "approved-value-hashes",
-    "claim": "Only approved non-secret values receive a keyed hash.",
+    "claim": "Only approved non-secret values receive a project-keyed hash.",
     "where": "configuration policy section, README",
     "test": "npm run test:claims -- @claim:approved-value-hashes",
-    "sandbox": "policy fixture verifies allowlisted value changes without raw values"
+    "sandbox": "Rust fixture checks secret hash absence and different hashes under different project keys"
+  },
+  {
+    "id": "fingerprint-schema",
+    "claim": "Fingerprints contain variable names, inferred types, a schema identifier, and a signature.",
+    "where": "workflow, privacy, README",
+    "test": "npm run test:claims -- @claim:fingerprint-schema",
+    "sandbox": "Rust fixture asserts fields and inferred boolean/integer types while scanning out a sentinel URL"
+  },
+  {
+    "id": "json-output",
+    "claim": "refp --json demo emits one parseable JSON document.",
+    "where": "CLI help",
+    "test": "npm run test:claims -- @claim:json-output",
+    "sandbox": "integration test parses the complete stdout document and inspects the real signed demo files"
+  },
+  {
+    "id": "direct-command",
+    "claim": "refp runs the command after -- directly without shell expansion.",
+    "where": "CLI capture help and workflow",
+    "test": "npm run test:claims -- @claim:direct-command",
+    "sandbox": "capture a literal shell metacharacter payload and assert its attempted marker file is never created"
+  },
+  {
+    "id": "repository-install",
+    "claim": "The repository installs one refp executable with working help.",
+    "where": "landing install command, README",
+    "test": "npm run test:claims -- @claim:repository-install",
+    "sandbox": "install the local repository package into a fresh temporary root and run refp --help"
+  },
+  {
+    "id": "build-artifacts",
+    "claim": "npm run build produces the release CLI and static site.",
+    "where": "README",
+    "test": "npm run test:claims -- @claim:build-artifacts",
+    "sandbox": "run the documented build and assert target/release/refp plus dist/site/index.html"
   }
 ]

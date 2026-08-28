@@ -9,9 +9,10 @@
     "build:site": "vite build --config site/vite.config.ts && node site/build-sw.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "cargo fmt --all -- --check && cargo clippy --workspace --all-targets -- -D warnings",
-    "preview": "vite preview --config site/vite.config.ts",
-    "test": "npm run typecheck && cargo test --workspace && npm run build:site && node site/test.mjs && node site/e2e.mjs",
-    "test:claims": "node site/claims.mjs"
+    "preview": "node site/serve-dist.mjs",
+    "test": "npm run typecheck && cargo test --workspace && npm run build:site && node site/test.mjs && node site/e2e.mjs && npm run test:claims:all",
+    "test:claims": "node site/claims.mjs",
+    "test:claims:all": "node site/all-claims.mjs"
   },
   "devDependencies": {
     "@types/node": "24.3.0",

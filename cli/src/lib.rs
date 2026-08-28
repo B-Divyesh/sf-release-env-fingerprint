@@ -554,12 +554,13 @@ PUBLIC_API_ORIGIN = ["api.example.com", ".example.internal"]
     #[test]
     fn detects_shape_type_and_allowlisted_value_drift() {
         let (source, policy) = policy();
-        let before = parse_environment(b"DATABASE_URL=x\0PUBLIC_API_ORIGIN=https://api.example.com\0NODE_ENV=staging\0COUNT=2\0").unwrap();
+        let before = parse_environment(b"DATABASE_URL=x\0PUBLIC_API_ORIGIN=https://api.example.com\0NODE_ENV=staging\0COUNT=2\0OLD=yes\0").unwrap();
         let after = parse_environment(b"DATABASE_URL=x\0PUBLIC_API_ORIGIN=https://api.example.com\0NODE_ENV=production\0COUNT=many\0EXTRA=yes\0").unwrap();
         let baseline = create_fingerprint("staging", &before, &policy, source, &[9; 32]).unwrap();
         let candidate =
             create_fingerprint("production", &after, &policy, source, &[9; 32]).unwrap();
         let report = compare(&baseline, &candidate);
+        assert_eq!(report.missing, vec!["OLD"]);
         assert_eq!(report.extra, vec!["EXTRA"]);
         assert_eq!(report.type_changed[0].name, "COUNT");
         assert_eq!(report.resolved_changed, vec!["NODE_ENV"]);
@@ -585,5 +586,127 @@ PUBLIC_API_ORIGIN = ["api.example.com", ".example.internal"]
         assert_eq!(fingerprint.payload.violations.len(), 2);
         let json = serde_json::to_string(&fingerprint).unwrap();
         assert!(!json.contains("evil.invalid"));
+    }
+
+    #[test]
+    fn enforces_required_names_and_prefixes() {
+        let source = r#"version = 1
+required_names = ["DATABASE_URL"]
+required_prefixes = ["PUBLIC_"]
+"#;
+        let policy = parse_policy(source).unwrap();
+        let missing = parse_environment(b"OTHER=value\0").unwrap();
+        let missing_fingerprint =
+            create_fingerprint("missing", &missing, &policy, source, &[3; 32]).unwrap();
+        assert!(missing_fingerprint
+            .payload
+            .violations
+            .iter()
+            .any(|item| item.rule == "required_name"));
+        assert!(missing_fingerprint
+            .payload
+            .violations
+            .iter()
+            .any(|item| item.rule == "required_prefix"));
+    }
+
+    #[test]
+    fn matches_exact_and_subdomain_hosts_without_recording_urls() {
+        let source = r#"version = 1
+[hosts]
+API_URL = ["api.example.com", ".services.example.com"]
+"#;
+        let policy = parse_policy(source).unwrap();
+        for host in ["api.example.com", "eu.services.example.com"] {
+            let input = format!("API_URL=https://{host}/private\0");
+            let fingerprint = create_fingerprint(
+                "allowed",
+                &parse_environment(input.as_bytes()).unwrap(),
+                &policy,
+                source,
+                &[3; 32],
+            )
+            .unwrap();
+            assert!(fingerprint.payload.violations.is_empty(), "{host}");
+        }
+        for host in [
+            "example.com",
+            "services.example.com",
+            "api.example.com.evil.test",
+        ] {
+            let input = format!("API_URL=https://{host}/private\0");
+            let fingerprint = create_fingerprint(
+                "blocked",
+                &parse_environment(input.as_bytes()).unwrap(),
+                &policy,
+                source,
+                &[3; 32],
+            )
+            .unwrap();
+            assert!(
+                fingerprint
+                    .payload
+                    .violations
+                    .iter()
+                    .any(|item| item.rule == "host_allowlist"),
+                "{host}"
+            );
+            assert!(!serde_json::to_string(&fingerprint).unwrap().contains(host));
+        }
+    }
+
+    #[test]
+    fn keys_change_approved_hashes_and_secrets_have_no_hash() {
+        let (source, policy) = policy();
+        let values =
+            parse_environment(b"DATABASE_URL=secret\0PUBLIC_X=y\0NODE_ENV=production\0").unwrap();
+        let first = create_fingerprint("one", &values, &policy, source, &[1; 32]).unwrap();
+        let second = create_fingerprint("two", &values, &policy, source, &[2; 32]).unwrap();
+        let first_secret = first
+            .payload
+            .variables
+            .iter()
+            .find(|item| item.name == "DATABASE_URL")
+            .unwrap();
+        let first_approved = first
+            .payload
+            .variables
+            .iter()
+            .find(|item| item.name == "NODE_ENV")
+            .unwrap();
+        let second_approved = second
+            .payload
+            .variables
+            .iter()
+            .find(|item| item.name == "NODE_ENV")
+            .unwrap();
+        assert!(first_secret.non_secret_hash.is_none());
+        assert_ne!(
+            first_approved.non_secret_hash,
+            second_approved.non_secret_hash
+        );
+    }
+
+    #[test]
+    fn fingerprint_schema_contains_names_types_and_signature() {
+        let (source, policy) = policy();
+        let values =
+            parse_environment(b"DATABASE_URL=postgres://db/private\0PUBLIC_X=true\0COUNT=4\0")
+                .unwrap();
+        let fingerprint = create_fingerprint("ci", &values, &policy, source, &[8; 32]).unwrap();
+        assert_eq!(fingerprint.payload.schema, SCHEMA);
+        assert!(fingerprint
+            .payload
+            .variables
+            .iter()
+            .any(|item| item.name == "PUBLIC_X" && item.value_type == ValueType::Boolean));
+        assert!(fingerprint
+            .payload
+            .variables
+            .iter()
+            .any(|item| item.name == "COUNT" && item.value_type == ValueType::Integer));
+        assert!(!fingerprint.signature.is_empty());
+        let json = serde_json::to_string(&fingerprint).unwrap();
+        assert!(!json.contains("postgres://db/private"));
     }
 }

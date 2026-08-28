@@ -111,3 +111,74 @@ fn empty_capture_is_an_actionable_error() {
         .contains("no environment records"));
     assert!(!output_path.exists());
 }
+
+#[test]
+fn demo_json_is_one_document_and_uses_real_signed_files() {
+    let output = Command::new(env!("CARGO_BIN_EXE_refp"))
+        .args(["--json", "demo"])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(2));
+    let document: Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(document["demo"], true);
+    assert_eq!(document["exit_code"], 2);
+    assert_eq!(document["report"]["drift"], true);
+    assert_eq!(
+        document["report"]["missing"],
+        serde_json::json!(["PUBLIC_API_ORIGIN"])
+    );
+    let directory = document["directory"].as_str().unwrap();
+    for name in [
+        "demo.key",
+        "refp.toml",
+        "baseline.env",
+        "candidate.env",
+        "baseline.refp.json",
+        "candidate.refp.json",
+    ] {
+        assert!(
+            std::path::Path::new(directory).join(name).is_file(),
+            "{name}"
+        );
+    }
+    for name in ["baseline.refp.json", "candidate.refp.json"] {
+        let fingerprint: Value =
+            serde_json::from_slice(&fs::read(std::path::Path::new(directory).join(name)).unwrap())
+                .unwrap();
+        assert!(fingerprint["signature"]
+            .as_str()
+            .is_some_and(|value| !value.is_empty()));
+    }
+}
+
+#[test]
+fn capture_executes_arguments_without_shell_expansion() {
+    let directory = tempfile::tempdir().unwrap();
+    let key = directory.path().join("project.key");
+    let policy = directory.path().join("refp.toml");
+    let fingerprint = directory.path().join("capture.json");
+    let marker = directory.path().join("must-not-exist");
+    let binary = env!("CARGO_BIN_EXE_refp");
+    assert!(Command::new(binary)
+        .args(["init", "--key"])
+        .arg(&key)
+        .arg("--policy")
+        .arg(&policy)
+        .status()
+        .unwrap()
+        .success());
+    fs::write(&policy, "version = 1\n").unwrap();
+    let literal = format!("SAFE=$(touch {})\n", marker.display());
+    let status = Command::new(binary)
+        .args(["capture", "--environment", "ci", "--key"])
+        .arg(&key)
+        .arg("--policy")
+        .arg(&policy)
+        .arg("--output")
+        .arg(&fingerprint)
+        .args(["--", "printf", &literal])
+        .status()
+        .unwrap();
+    assert!(status.success());
+    assert!(!marker.exists());
+}

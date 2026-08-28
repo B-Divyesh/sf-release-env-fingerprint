@@ -14,10 +14,10 @@ use std::time::{SystemTime, UNIX_EPOCH};
 #[command(
     name = "refp",
     version,
-    about = "Prove release environment shape without recording values"
+    about = "Compare release configuration without recording raw values"
 )]
 #[command(
-    long_about = "Capture and compare signed environment fingerprints without persisting raw values.\n\nValues are read only from the explicit command after `--`. Secret values become name/type/presence records; only policy-allowlisted non-secrets receive keyed hashes."
+    long_about = "Capture and compare signed environment fingerprints without recording raw values.\n\nValues come from the command after `--`. Fingerprints contain variable names and types. Only values marked non-secret receive keyed hashes."
 )]
 struct Cli {
     /// Emit stable JSON output for scripts
@@ -165,23 +165,22 @@ fn demo(json_output: bool) -> Result<u8, String> {
         output: candidate.clone(),
         command: vec!["cat".to_string(), candidate_source.display().to_string()],
     };
-    // These are the real capture and compare functions, not a mock report.
-    let _ = capture(&baseline_args, false)?;
-    let _ = capture(&candidate_args, false)?;
-    let report_code = compare_command(
-        &CompareArgs {
-            key: key_path,
-            baseline,
-            candidate,
-        },
-        json_output,
-    )?;
+    // Use the normal capture implementation, then verify both files before comparing.
+    let baseline_fingerprint = capture_to_file(&baseline_args)?;
+    let candidate_fingerprint = capture_to_file(&candidate_args)?;
+    let key = load_key(&key_path)?;
+    verify_fingerprint(&baseline_fingerprint, &key)
+        .map_err(|error| format!("baseline {}: {error}", baseline.display()))?;
+    verify_fingerprint(&candidate_fingerprint, &key)
+        .map_err(|error| format!("candidate {}: {error}", candidate.display()))?;
+    let report = compare(&baseline_fingerprint, &candidate_fingerprint);
+    let report_code = if report.drift { 2 } else { 0 };
     if json_output {
-        println!(
-            "{}",
-            json!({"demo": true, "directory": directory, "exit_code": report_code})
-        );
+        print_json(
+            &json!({"demo": true, "directory": directory, "exit_code": report_code, "report": report}),
+        )?;
     } else {
+        print_report(&report);
         println!("Demo files remain at {}", directory.display());
         println!("This sample is isolated from your project files.");
     }
@@ -222,6 +221,32 @@ fn init(args: &InitArgs, json_output: bool) -> Result<u8, String> {
 }
 
 fn capture(args: &CaptureArgs, json_output: bool) -> Result<u8, String> {
+    let fingerprint = capture_to_file(args)?;
+    let violations = fingerprint.payload.violations.len();
+    if json_output {
+        print_json(&json!({
+            "ok": violations == 0,
+            "output": args.output,
+            "environment": args.environment,
+            "variables": fingerprint.payload.variables.len(),
+            "violations": fingerprint.payload.violations,
+            "values_persisted": 0
+        }))?;
+    } else {
+        println!(
+            "Captured {} variables for {} → {} (0 values persisted)",
+            fingerprint.payload.variables.len(),
+            args.environment,
+            args.output.display()
+        );
+        for violation in &fingerprint.payload.violations {
+            println!("! {}: {}", violation.rule, violation.message);
+        }
+    }
+    Ok(if violations == 0 { 0 } else { 2 })
+}
+
+fn capture_to_file(args: &CaptureArgs) -> Result<Fingerprint, String> {
     if args.output.exists() {
         return Err(format!(
             "output {} already exists; choose a new path",
@@ -256,28 +281,7 @@ fn capture(args: &CaptureArgs, json_output: bool) -> Result<u8, String> {
     let serialized = serde_json::to_vec_pretty(&fingerprint)
         .map_err(|error| format!("could not serialize fingerprint: {error}"))?;
     write_private(&args.output, &serialized, false)?;
-    let violations = fingerprint.payload.violations.len();
-    if json_output {
-        print_json(&json!({
-            "ok": violations == 0,
-            "output": args.output,
-            "environment": args.environment,
-            "variables": fingerprint.payload.variables.len(),
-            "violations": fingerprint.payload.violations,
-            "values_persisted": 0
-        }))?;
-    } else {
-        println!(
-            "Captured {} variables for {} → {} (0 values persisted)",
-            fingerprint.payload.variables.len(),
-            args.environment,
-            args.output.display()
-        );
-        for violation in &fingerprint.payload.violations {
-            println!("! {}: {}", violation.rule, violation.message);
-        }
-    }
-    Ok(if violations == 0 { 0 } else { 2 })
+    Ok(fingerprint)
 }
 
 fn compare_command(args: &CompareArgs, json_output: bool) -> Result<u8, String> {
