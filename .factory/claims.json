@@ -1,7 +1,7 @@
 [
   {
     "id": "detect-config-differences",
-    "claim": "The CLI finds missing, extra, type, and approved non-secret value differences.",
+    "claim": "The CLI finds missing, extra, type, and marked non-secret value differences.",
     "where": "landing first screen, workflow, README",
     "test": "npm run test:claims -- @claim:detect-config-differences",
     "sandbox": "Rust fixture creates two fingerprints and asserts every difference class"
@@ -78,17 +78,17 @@
   },
   {
     "id": "approved-value-hashes",
-    "claim": "Only approved non-secret values receive a project-keyed hash.",
-    "where": "configuration policy section, README",
+    "claim": "Only values marked non-secret are hashed with the project key.",
+    "where": "release setting rules section, README",
     "test": "npm run test:claims -- @claim:approved-value-hashes",
     "sandbox": "Rust fixture checks secret hash absence and different hashes under different project keys"
   },
   {
     "id": "fingerprint-schema",
-    "claim": "Fingerprints contain variable names, inferred types, a schema identifier, and a signature.",
+    "claim": "Fingerprints contain variable names, inferred types, a format version, and a signature.",
     "where": "workflow, privacy, README",
     "test": "npm run test:claims -- @claim:fingerprint-schema",
-    "sandbox": "Rust fixture asserts fields and inferred boolean/integer types while scanning out a sentinel URL"
+    "sandbox": "Rust fixture asserts format fields and inferred boolean/integer types while scanning out a sentinel URL"
   },
   {
     "id": "json-output",
@@ -117,5 +117,12 @@
     "where": "README",
     "test": "npm run test:claims -- @claim:build-artifacts",
     "sandbox": "run the documented build and assert target/release/refp plus dist/site/index.html"
+  },
+  {
+    "id": "github-actions-example",
+    "claim": "The GitHub Actions example installs refp, captures CI release settings, and returns exit 2 for release differences.",
+    "where": "README GitHub Actions section",
+    "test": "npm run test:claims -- @claim:github-actions-example",
+    "sandbox": "inspect the shipped workflow, install the current package in a fresh root, capture production and CI settings, and assert the real comparison exits 2"
   }
 ]

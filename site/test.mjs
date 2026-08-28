@@ -13,17 +13,34 @@ assert.match(html, /apple-touch-icon/);
 assert.doesNotMatch(html, /https:\/\/(fonts|cdn|unpkg|jsdelivr)\./);
 assert.ok((await stat('dist/site/social-card.jpg')).size > 0, 'social card missing');
 assert.ok((await stat('dist/site/apple-touch-icon.png')).size > 0, 'apple touch icon missing');
+assert.ok((await stat('dist/site/refp-demo.svg')).size > 0, 'terminal recording missing');
 assert.ok((await stat('dist/site/404.html')).size > 0, 'static 404 missing');
 assert.ok((await stat('dist/site/LICENSE.txt')).size > 0, 'deployed license missing');
 
 for (const [route, title, canonical] of [
+  ['', 'Release Env Fingerprint — compare release settings', '/'],
   ['demo', 'Demo — Release Env Fingerprint', '/demo'],
   ['privacy', 'Privacy — Release Env Fingerprint', '/privacy'],
-  ['terms', 'Terms — Release Env Fingerprint', '/terms']
+  ['terms', 'Terms — Release Env Fingerprint', '/terms'],
+  ['404.html', 'Page not found — Release Env Fingerprint', '/404']
 ]) {
-  const routeHtml = await readFile(`dist/site/${route}/index.html`, 'utf8');
+  const routeFile = route === '' ? 'dist/site/index.html' : route.endsWith('.html') ? `dist/site/${route}` : `dist/site/${route}/index.html`;
+  const routeHtml = await readFile(routeFile, 'utf8');
   assert.match(routeHtml, new RegExp(`<title>${title}</title>`));
   assert.match(routeHtml, new RegExp(`rel="canonical" href="https://release-env-fingerprint.sociobot.in${canonical}"`));
+  for (const field of ['og:type', 'og:title', 'og:description', 'og:url', 'og:image', 'og:image:width', 'og:image:height', 'og:image:alt']) {
+    assert.match(routeHtml, new RegExp(`property="${field}"`), `${route || 'home'} ${field}`);
+  }
+  for (const field of ['twitter:card', 'twitter:title', 'twitter:description', 'twitter:image', 'twitter:image:alt']) {
+    assert.match(routeHtml, new RegExp(`name="${field}"`), `${route || 'home'} ${field}`);
+  }
+  assert.match(routeHtml, /apple-touch-icon/);
+}
+const notFoundHtml = await readFile('dist/site/404.html', 'utf8');
+assert.match(notFoundHtml, /name="robots" content="noindex"/);
+assert.doesNotMatch(notFoundHtml, /404\.css|◉ REFP|Try sample/);
+for (const asset of [...html.matchAll(/(?:src|href)="(\/assets\/[^"?#]+)"/g)].map((match) => match[1])) {
+  assert.ok(notFoundHtml.includes(asset), `404 must use shared asset ${asset}`);
 }
 
 const assets = [...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map((match) => match[1]);
@@ -38,7 +55,7 @@ assert(jsBytes <= 200 * 1024, `initial JS is ${jsBytes} bytes`);
 assert(cssBytes <= 50 * 1024, `CSS is ${cssBytes} bytes`);
 assert((await stat('dist/site/proof-sheet.webp')).size <= 300 * 1024, 'hero exceeds 300 KB');
 
-const shell = ['/', '/?demo=1', '/demo/', '/privacy/', '/terms/', ...assets, '/proof-sheet.webp', '/fingerprint.svg', '/manifest.webmanifest'];
+const shell = ['/', '/?demo=1', '/demo/', '/privacy/', '/terms/', ...assets, '/proof-sheet.webp', '/refp-demo.svg', '/fingerprint.svg', '/manifest.webmanifest'];
 const digest = createHash('sha256');
 for (const path of shell) {
   digest.update(path);

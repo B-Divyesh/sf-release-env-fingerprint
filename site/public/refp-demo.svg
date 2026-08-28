@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">refp demo terminal recording</title>
+  <desc id="desc">The real command compares production and candidate fingerprints, finds five differences, and writes only to a temporary folder.</desc>
+  <style>
+    .entry{font:24px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:#f7efdc;opacity:0;animation:reveal .01s linear forwards}.prompt{fill:#80bf8a}.bad{fill:#ff8374}.extra{fill:#9fd2d8}.changed{fill:#efb763}.e0{animation-delay:0ms}.e1{animation-delay:420ms}.e2{animation-delay:840ms}.e3{animation-delay:1260ms}.e4{animation-delay:1680ms}.e5{animation-delay:2100ms}.e6{animation-delay:2520ms}.e7{animation-delay:2940ms}.e8{animation-delay:3360ms}.e9{animation-delay:3780ms}
+    @keyframes reveal{to{opacity:1}}
+    @media(prefers-reduced-motion:reduce){.entry{opacity:1;animation:none}}
+  </style>
+  <rect width="1200" height="630" fill="#20221f"/>
+  <rect x="1" y="1" width="1198" height="628" fill="none" stroke="#191a18" stroke-width="2"/>
+  <rect width="1200" height="54" fill="#191a18"/>
+  <circle cx="28" cy="27" r="7" fill="#d14b3d"/><circle cx="52" cy="27" r="7" fill="#d58c28"/><circle cx="76" cy="27" r="7" fill="#5b985f"/>
+  <text x="1140" y="34" text-anchor="end" fill="#b8baae" font-family="ui-monospace,monospace" font-size="16">REAL CLI · SAMPLE RUN</text>
+  <text class="entry prompt e0" x="54" y="96">$ refp demo</text>
+  <text class="entry line e1" x="54" y="146">production → candidate</text>
+  <text class="entry bad e2" x="54" y="196">✕ DIFFERENCES FOUND</text>
+  <text class="entry bad e3" x="54" y="246">- missing    PUBLIC_API_ORIGIN</text>
+  <text class="entry extra e4" x="54" y="296">+ extra      DEBUG</text>
+  <text class="entry extra e5" x="54" y="346">+ extra      PUBLIC_API_URL</text>
+  <text class="entry changed e6" x="54" y="396">~ type       LOG_LEVEL (String → Integer)</text>
+  <text class="entry changed e7" x="54" y="446">~ value      NODE_ENV (value marked non-secret changed)</text>
+  <text class="entry line e8" x="54" y="496">Demo files remain at &lt;temporary folder&gt;</text>
+  <text class="entry line e9" x="54" y="546">This sample is isolated from your project files.</text>
+</svg>

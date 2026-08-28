@@ -1,0 +1,56 @@
+{
+  "home-mobile": {
+    "status": 200,
+    "title": "Release Env Fingerprint — compare release settings",
+    "h1": "COMPARE RELEASE SETTINGS WITHOUT EXPOSING SECRETS.",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "finalFactBottom": 801.9375,
+    "finalResultBottom": null
+  },
+  "demo-mobile": {
+    "status": 200,
+    "title": "Demo — Release Env Fingerprint",
+    "h1": "COMPARE PRODUCTION WITH A CANDIDATE RELEASE.",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "finalFactBottom": null,
+    "finalResultBottom": 814.65625
+  },
+  "404-mobile": {
+    "status": 404,
+    "title": "Page not found — Release Env Fingerprint",
+    "h1": "THIS PROOF SHEET IS MISSING.",
+    "scrollWidth": 390,
+    "clientWidth": 390,
+    "finalFactBottom": null,
+    "finalResultBottom": null
+  },
+  "home-desktop": {
+    "status": 200,
+    "title": "Release Env Fingerprint — compare release settings",
+    "h1": "COMPARE RELEASE SETTINGS WITHOUT EXPOSING SECRETS.",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "finalFactBottom": 891.84375,
+    "finalResultBottom": null
+  },
+  "demo-desktop": {
+    "status": 200,
+    "title": "Demo — Release Env Fingerprint",
+    "h1": "COMPARE PRODUCTION WITH A CANDIDATE RELEASE.",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "finalFactBottom": null,
+    "finalResultBottom": 840.5
+  },
+  "home-full": {
+    "status": 200,
+    "title": "Release Env Fingerprint — compare release settings",
+    "h1": "COMPARE RELEASE SETTINGS WITHOUT EXPOSING SECRETS.",
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "finalFactBottom": 891.84375,
+    "finalResultBottom": null
+  }
+}

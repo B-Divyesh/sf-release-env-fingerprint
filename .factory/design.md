@@ -87,3 +87,18 @@ decisive. The sample uses a sticky ochre proof label as its persistent demo
 boundary. Real legal and error routes reuse the paper, press rules,
 registration-shadow layers, and display/mono pairing. No new image asset or
 third-party material was introduced.
+
+## Polish round 2
+
+The demo now opens like a compact press verdict: the ochre sandbox strip is
+followed immediately by a five-row computed comparison on the teal bench.
+Editors sit below the verdict, so the result leads while the controls remain
+available. Desktop spacing was tightened to keep all three proof facts in the
+first 900 px without changing the asymmetric two-column composition.
+
+`site/public/refp-demo.svg` is an original, self-hosted terminal recording.
+`site/generate-recording.mjs` runs the real `refp demo` command, normalizes its
+temporary path, and turns the captured lines into a single non-looping reveal.
+Reduced-motion mode shows the completed transcript immediately. It uses only
+the existing ink, red, ochre, teal, and moss palette; no third-party asset or
+model-generated material was added in this round.

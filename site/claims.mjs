@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { execFileSync, spawn } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { mkdtemp, readFile, readdir, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -54,6 +54,8 @@ if (tag === '@claim:detect-config-differences') {
     await page.goto(`${origin}/?demo=1`, { waitUntil: 'networkidle' });
     await page.locator('.result-header').filter({ hasText: '5 differences' }).waitFor();
     assert.deepEqual(await page.locator('.result-row code').allTextContents(), ['NODE_ENV', 'PUBLIC_API_ORIGIN', 'LOG_LEVEL', 'PUBLIC_API_URL', 'DEBUG']);
+    const resultBottom = await page.locator('.result-row').last().evaluate((element) => element.getBoundingClientRect().bottom);
+    assert.ok(resultBottom <= 844, `completed sample must fit the first demo screen: ${resultBottom}px`);
     await page.locator('#candidate-input').fill(await page.locator('#baseline-input').inputValue());
     await page.locator('#compare-button').click();
     await page.locator('.result-header.is-match').waitFor();
@@ -137,6 +139,43 @@ if (tag === '@claim:detect-config-differences') {
   execFileSync('npm', ['run', 'build'], { stdio: 'inherit' });
   assert.equal((await stat('target/release/refp')).isFile(), true);
   assert.equal((await stat('dist/site/index.html')).isFile(), true);
+} else if (tag === '@claim:github-actions-example') {
+  const workflow = await readFile('examples/github-actions.yml', 'utf8');
+  assert.match(workflow, /REFP_PROJECT_KEY: \$\{\{ secrets\.REFP_PROJECT_KEY \}\}/);
+  assert.match(workflow, /cargo install .* --bin refp --locked/);
+  assert.match(workflow, /refp capture --environment ci .* -- env -0/);
+  assert.match(workflow, /refp compare .*--baseline fingerprints\/production\.refp\.json ci\.refp\.json/);
+  assert.match(workflow, /if \[ "\$status" -eq 2 \]; then[\s\S]*exit 2/);
+  assert.match(workflow, /permissions:\n  contents: read/);
+
+  const installRoot = await mkdtemp(join(tmpdir(), 'refp-actions-install-'));
+  const workspace = await mkdtemp(join(tmpdir(), 'refp-actions-workspace-'));
+  execFileSync('cargo', ['install', '--path', 'cli', '--root', installRoot, '--locked'], { stdio: 'inherit' });
+  const binary = join(installRoot, 'bin/refp');
+  execFileSync(binary, ['init', '--key', '.refp-key', '--policy', 'refp.toml'], { cwd: workspace, stdio: 'pipe' });
+  const commonEnvironment = {
+    PATH: process.env.PATH,
+    DATABASE_URL: 'postgres://release-db.internal/service',
+    PUBLIC_API_ORIGIN: 'https://api.example.com'
+  };
+  execFileSync(binary, ['capture', '--environment', 'production', '--key', '.refp-key', '--policy', 'refp.toml', '--output', 'production.refp.json', '--', 'env', '-0'], {
+    cwd: workspace,
+    env: { ...commonEnvironment, NODE_ENV: 'production' },
+    stdio: 'pipe'
+  });
+  execFileSync(binary, ['capture', '--environment', 'ci', '--key', '.refp-key', '--policy', 'refp.toml', '--output', 'ci.refp.json', '--', 'env', '-0'], {
+    cwd: workspace,
+    env: { ...commonEnvironment, NODE_ENV: 'staging', DEBUG: 'true' },
+    stdio: 'pipe'
+  });
+  const comparison = spawnSync(binary, ['compare', '--key', '.refp-key', '--baseline', 'production.refp.json', 'ci.refp.json'], {
+    cwd: workspace,
+    encoding: 'utf8'
+  });
+  assert.equal(comparison.status, 2, comparison.stderr);
+  assert.match(comparison.stdout, /DIFFERENCES FOUND/);
+  assert.match(comparison.stdout, /NODE_ENV/);
+  assert.match(comparison.stdout, /DEBUG/);
 }
 
 console.log('claim passed: ' + tag);

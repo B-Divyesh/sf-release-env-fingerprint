@@ -7,10 +7,12 @@
     "dev": "vite site",
     "build": "cargo build --workspace --release && npm run build:site",
     "build:site": "vite build --config site/vite.config.ts && node site/build-sw.mjs",
+    "record:demo": "node site/generate-recording.mjs",
+    "recording:check": "node site/generate-recording.mjs --check",
     "typecheck": "tsc --noEmit",
     "lint": "cargo fmt --all -- --check && cargo clippy --workspace --all-targets -- -D warnings",
     "preview": "node site/serve-dist.mjs",
-    "test": "npm run typecheck && cargo test --workspace && npm run build:site && node site/test.mjs && node site/e2e.mjs && npm run test:claims:all",
+    "test": "npm run typecheck && cargo test --workspace && npm run recording:check && npm run build:site && node site/test.mjs && node site/e2e.mjs && npm run test:claims:all",
     "test:claims": "node site/claims.mjs",
     "test:claims:all": "node site/all-claims.mjs"
   },

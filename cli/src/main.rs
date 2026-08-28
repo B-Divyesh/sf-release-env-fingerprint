@@ -14,7 +14,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 #[command(
     name = "refp",
     version,
-    about = "Compare release configuration without recording raw values"
+    about = "Compare release settings without recording raw values"
 )]
 #[command(
     long_about = "Capture and compare signed environment fingerprints without recording raw values.\n\nValues come from the command after `--`. Fingerprints contain variable names and types. Only values marked non-secret receive keyed hashes."
@@ -311,10 +311,10 @@ fn read_fingerprint(path: &PathBuf) -> Result<Fingerprint, String> {
 fn print_report(report: &CompareReport) {
     println!("{} → {}", report.baseline, report.candidate);
     if !report.drift {
-        println!("✓ MATCH · signatures valid · no drift");
+        println!("✓ MATCH · signatures valid · no differences");
         return;
     }
-    println!("✕ DRIFT DETECTED");
+    println!("✕ DIFFERENCES FOUND");
     for name in &report.missing {
         println!("- missing    {name}");
     }
@@ -328,7 +328,7 @@ fn print_report(report: &CompareReport) {
         );
     }
     for name in &report.resolved_changed {
-        println!("~ resolved   {name} (allowlisted non-secret hash changed)");
+        println!("~ value      {name} (value marked non-secret changed)");
     }
     if report.policy_changed {
         println!("~ policy     policy digest changed");

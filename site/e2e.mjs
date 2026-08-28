@@ -26,7 +26,7 @@ async function axe(page, route) {
 try {
   await ready();
   for (const [path, status, title] of [
-    ['/', 200, 'Release Env Fingerprint — compare release config'],
+    ['/', 200, 'Release Env Fingerprint — compare release settings'],
     ['/demo', 200, 'Demo — Release Env Fingerprint'],
     ['/privacy', 200, 'Privacy — Release Env Fingerprint'],
     ['/terms', 200, 'Terms — Release Env Fingerprint'],
@@ -46,8 +46,10 @@ try {
 
   await page.goto(origin, { waitUntil: 'networkidle' });
   assert.equal(await page.locator('h1').count(), 1);
-  assert.match(await page.locator('h1').innerText(), /Compare release configuration/i);
+  assert.match(await page.locator('h1').innerText(), /Compare release settings/i);
   assert.match(await page.locator('.lede').innerText(), /engineers shipping one service/i);
+  assert.deepEqual(await page.locator('.steps h3').allTextContents(), ['Capture release settings', 'Sign the fingerprint', 'Compare environments']);
+  assert.equal(await page.getByRole('link', { name: 'Open sample comparison' }).count(), 1);
   const heroAction = page.getByRole('link', { name: 'Try it with sample data' }).first();
   await heroAction.waitFor();
   const facts = page.locator('.proof-points li');
@@ -56,7 +58,15 @@ try {
   assert.ok(firstScreenBottom <= 844, `mobile facts leave first screen at ${firstScreenBottom}px`);
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth), true);
 
-  await heroAction.click();
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(origin, { waitUntil: 'networkidle' });
+  const desktopFactsBottom = await page.locator('.proof-points li').last().evaluate((element) => element.getBoundingClientRect().bottom);
+  assert.ok(desktopFactsBottom <= 900, `desktop facts leave first screen at ${desktopFactsBottom}px`);
+  assert.equal(await page.locator('.terminal-recording img').getAttribute('src'), '/refp-demo.svg');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(origin, { waitUntil: 'networkidle' });
+
+  await page.getByRole('link', { name: 'Try it with sample data' }).first().click();
   await page.waitForURL(`${origin}/?demo=1`);
   assert.equal(await page.title(), 'Demo — Release Env Fingerprint');
   assert.equal(await page.locator('h1').count(), 1);
@@ -64,6 +74,17 @@ try {
   await page.locator('.result-header.has-drift').waitFor();
   assert.equal(await page.locator('.result-row').count(), 5);
   assert.match(await page.locator('.result-header').innerText(), /5 differences/);
+  assert.match(await page.locator('h1').innerText(), /production.*candidate/i);
+  const mobileResultBottom = await page.locator('.result-row').last().evaluate((element) => element.getBoundingClientRect().bottom);
+  assert.ok(mobileResultBottom <= 844, `mobile computed result leaves first demo screen at ${mobileResultBottom}px`);
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(`${origin}/?demo=1`, { waitUntil: 'networkidle' });
+  await page.locator('.result-header.has-drift').waitFor();
+  const desktopResultBottom = await page.locator('.result-row').last().evaluate((element) => element.getBoundingClientRect().bottom);
+  assert.ok(desktopResultBottom <= 900, `desktop computed result leaves first demo screen at ${desktopResultBottom}px`);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`${origin}/?demo=1`, { waitUntil: 'networkidle' });
 
   await page.locator('#candidate-input').fill(await page.locator('#baseline-input').inputValue());
   await page.locator('#compare-button').click();
@@ -114,8 +135,21 @@ try {
     assert.equal(await page.locator('main').count(), 1, `${route} main`);
     const canonical = await page.locator('link[rel="canonical"]').getAttribute('href');
     assert.ok(canonical?.startsWith('https://release-env-fingerprint.sociobot.in/'), `${route} canonical`);
+    assert.equal(await page.getByRole('link', { name: 'Open sample comparison' }).count(), 1, `${route} result-naming demo navigation`);
     await axe(page, route);
   }
+
+  const notFoundPage = await context.newPage();
+  const notFoundResponse = await notFoundPage.goto(`${origin}/does-not-exist-polish-2`, { waitUntil: 'networkidle' });
+  assert.equal(notFoundResponse?.status(), 404);
+  assert.equal(await notFoundPage.title(), 'Page not found — Release Env Fingerprint');
+  assert.equal(await notFoundPage.locator('.brand svg').count(), 1, '404 shared brand');
+  assert.equal(await notFoundPage.locator('.site-header nav a').count(), 4, '404 shared header navigation');
+  assert.match(await notFoundPage.locator('.footer-brand').innerText(), /Compare release settings/);
+  assert.equal(await notFoundPage.getByRole('link', { name: /Source on GitHub/ }).count(), 1);
+  assert.match(await notFoundPage.locator('footer').innerText(), /build polish-2/);
+  await axe(notFoundPage, '/404');
+  await notFoundPage.close();
 
   await page.goto(`${origin}/?demo=1`, { waitUntil: 'networkidle' });
   await page.evaluate(() => navigator.serviceWorker.ready);

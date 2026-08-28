@@ -6,7 +6,7 @@ const sourceHtml = await readFile(new URL('index.html', root), 'utf8');
 const template = await readFile(new URL('sw-template.js', import.meta.url), 'utf8');
 
 const routePages = [
-  { directory: 'demo', title: 'Demo — Release Env Fingerprint', description: 'Compare five release configuration differences in an isolated browser sample.', canonical: '/demo' },
+  { directory: 'demo', title: 'Demo — Release Env Fingerprint', description: 'Compare five release setting differences in an isolated browser sample.', canonical: '/demo' },
   { directory: 'privacy', title: 'Privacy — Release Env Fingerprint', description: 'How the site and browser sample handle data.', canonical: '/privacy' },
   { directory: 'terms', title: 'Terms — Release Env Fingerprint', description: 'MIT License terms for Release Env Fingerprint.', canonical: '/terms' }
 ];
@@ -29,10 +29,16 @@ for (const route of routePages) {
   await mkdir(directory, { recursive: true });
   await writeFile(new URL('index.html', directory), routeHtml(route));
 }
+const notFound = routeHtml({
+  title: 'Page not found — Release Env Fingerprint',
+  description: 'This Release Env Fingerprint page does not exist.',
+  canonical: '/404'
+}).replace('<meta name="theme-color"', '<meta name="robots" content="noindex" />\n    <meta name="theme-color"');
+await writeFile(new URL('404.html', root), notFound);
 await writeFile(new URL('LICENSE.txt', root), await readFile(new URL('../LICENSE', import.meta.url)));
 
 const hashedAssets = [...sourceHtml.matchAll(/(?:src|href)="(\/assets\/[^"?#]+)"/g)].map((match) => match[1]);
-const shell = ['/', '/?demo=1', '/demo/', '/privacy/', '/terms/', ...hashedAssets, '/proof-sheet.webp', '/fingerprint.svg', '/manifest.webmanifest'];
+const shell = ['/', '/?demo=1', '/demo/', '/privacy/', '/terms/', ...hashedAssets, '/proof-sheet.webp', '/refp-demo.svg', '/fingerprint.svg', '/manifest.webmanifest'];
 const fileFor = (path) => {
   if (path === '/' || path === '/?demo=1') return 'index.html';
   if (path.endsWith('/')) return `${path.slice(1)}index.html`;

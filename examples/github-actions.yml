@@ -1,0 +1,40 @@
+name: Compare release settings
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare-release-settings:
+    runs-on: ubuntu-latest
+    env:
+      REFP_PROJECT_KEY: ${{ secrets.REFP_PROJECT_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install refp
+        run: cargo install --git https://github.com/B-Divyesh/sf-release-env-fingerprint --bin refp --locked
+      - name: Restore the project key
+        shell: bash
+        run: |
+          test -n "$REFP_PROJECT_KEY"
+          printf '%s\n' "$REFP_PROJECT_KEY" > .refp-key
+          chmod 600 .refp-key
+      - name: Capture CI release settings
+        shell: bash
+        run: refp capture --environment ci --key .refp-key --policy refp.toml --output ci.refp.json -- env -0
+      - name: Compare CI with production
+        shell: bash
+        run: |
+          set +e
+          refp compare --key .refp-key --baseline fingerprints/production.refp.json ci.refp.json
+          status=$?
+          set -e
+          if [ "$status" -eq 2 ]; then
+            echo "::error::Release settings differ from production."
+            exit 2
+          fi
+          exit "$status"
