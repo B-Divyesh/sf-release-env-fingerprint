@@ -1,6 +1,6 @@
 # Release Env Fingerprint — repair handoff
 
-## Verdict: repaired and locally verified
+## Verdict: repaired, deployed, and verified
 
 Work order `release-env-fingerprint-repair-1` repairs every finding in the
 independent verifier report at `672b0df56d579b8702332ddb4d27700f3d3cfb52`
@@ -58,7 +58,7 @@ cookies/Web Storage/IndexedDB, reduced motion, console errors, and axe.
 - `npm run build`: release binary and `dist/site/` produced. Initial assets are
   4,646 B JS, 14,427 B CSS, and 178,612 B WebP; generated cache
   `refp-shell-22baba54b7fd2883` precaches 6 shell resources.
-- `cargo package --manifest-path cli/Cargo.toml --allow-dirty`: 66.3 KiB
+- `cargo package --manifest-path cli/Cargo.toml`: 66.3 KiB
   package, 18.6 KiB compressed, with Cargo's package verification passing. The
   packaged crate installed into an empty prefix; `refp --version` returned
   `0.1.0` and the complete `--help` contract rendered.
@@ -81,8 +81,27 @@ not performed; factory credentials own that step.
 
 ## Deployment and live evidence
 
-Pending final commit, push, static deployment, response-policy verification,
-and deploy/build identity comparison.
+- Repair commit `25161ed011541d07bd64fa6550f1b761d5528398` was pushed to
+  `origin/main` and `dist/site/` was deployed with the factory static deployer
+  to <https://release-env-fingerprint.sociobot.in>.
+- Factory `verify-url.sh`: HTTP 200 in 667 ms, 0 browser errors, correct title
+  and `lang`, one H1, main landmark present, 0 missing image alts, and 0
+  unlabeled buttons.
+- Live 390 px browser audit: `main` is 390/390 px scroll/client width; 0 clipped
+  primary descendants; 0 visible link/button targets below 44×44 px; Compare
+  retained focus; 0 serious/critical axe violations; 0 console/page errors;
+  all requests used the product origin.
+- Live CacheStorage contains `/`, hashed JS, hashed CSS, the proof image, icon,
+  and manifest. After clearing Chromium's HTTP cache, an offline reload loaded
+  the app and the seeded comparison still produced drift.
+- Live headers: HTML is `no-cache, must-revalidate`; `sw.js` is
+  `no-cache, no-store, must-revalidate`; both hashed JS and CSS are
+  `public, max-age=31536000, immutable`. CSP, HSTS, nosniff, no-referrer, and
+  restrictive permissions policy are present.
+- SHA-256 identity: 10 deployable files plus `/` byte-match `dist/site/`; HTML
+  is `070dd146be4c540def006f788c572603d49867f87b1ac98e7f74cc86e486718d`.
+- Live Lighthouse 13 mobile: Performance 100, Accessibility 100, Best Practices
+  100, SEO 100; FCP 0.886 s, LCP 1.657 s, CLS 0, TBT 0 ms, transfer 190,729 B.
 
 ## Known gaps
 
