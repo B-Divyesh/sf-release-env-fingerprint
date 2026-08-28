@@ -43,7 +43,7 @@ function render(focus = false): void {
   const path = window.location.pathname;
   const isDemo = new URLSearchParams(window.location.search).get('demo') === '1';
   if (path === '/' || path === '/index.html') { app.innerHTML = chrome(home(isDemo)); setMeta(isDemo ? 'Demo — Release Env Fingerprint' : 'Release Env Fingerprint — compare release config', isDemo ? 'Compare the bundled release configuration sample.' : 'Compare release configuration without exposing secrets.', isDemo ? '/?demo=1' : '/'); }
-  else if (path === '/demo') { app.innerHTML = chrome('<main id="main">' + demo(true) + '</main>'); setMeta('Demo — Release Env Fingerprint', 'Compare the bundled release configuration sample.', '/demo'); }
+  else if (path === '/demo') { app.innerHTML = chrome('<main id="main"><section class="demo-route-title"><h1 tabindex="-1">Compare the sample release configuration.</h1></section>' + demo(true) + '</main>'); setMeta('Demo — Release Env Fingerprint', 'Compare the bundled release configuration sample.', '/demo'); }
   else if (path === '/privacy' || path === '/terms') { app.innerHTML = chrome(legal(path.slice(1) as 'privacy' | 'terms')); setMeta((path === '/privacy' ? 'Privacy' : 'Terms') + ' — Release Env Fingerprint', path === '/privacy' ? 'How the site and sample handle data.' : 'MIT license terms for the CLI.', path); }
   else { app.innerHTML = chrome(notFound()); setMeta('Page not found — Release Env Fingerprint', 'This Release Env Fingerprint page does not exist.', '/404'); }
   bindRoutes(); bindCopy(); bindDemo(isDemo || path === '/demo');

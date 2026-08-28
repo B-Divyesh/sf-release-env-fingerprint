@@ -191,6 +191,8 @@ footer a { min-width: 44px; min-height: 44px; display: inline-flex; align-items:
 footer p { max-width: 70ch; margin: 0; }
 footer > p:last-child { grid-column: 2; grid-row: 2; }
 .legal-page { min-height: 64vh; padding: 96px 24px; }
+.demo-route-title { max-width: 1180px; margin: 0 auto; padding: 64px 24px 0; }
+.demo-route-title h1 { font-size: clamp(42px, 6vw, 72px); text-transform: uppercase; }
 .legal-sheet { max-width: 760px; margin: 0 auto; padding: 40px; border: 2px solid var(--ink); background: var(--paper-high); box-shadow: 10px 10px 0 var(--blue), 16px 16px 0 var(--red); }
 .legal-sheet h1 { margin-bottom: 28px; font-size: clamp(40px, 6vw, 66px); text-transform: uppercase; }
 .legal-sheet p { max-width: 65ch; font-size: 17px; }
