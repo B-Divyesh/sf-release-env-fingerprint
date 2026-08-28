@@ -5,3 +5,4 @@
 *.refp.json
 site/public/proof-sheet-source.png
 site/public/proof-sheet-source.png.json
+/graphify-out/

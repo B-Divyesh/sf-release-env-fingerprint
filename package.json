@@ -1,0 +1,22 @@
+{
+  "name": "release-env-fingerprint",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite site",
+    "build": "cargo build --workspace --release && npm run build:site",
+    "build:site": "vite build --config site/vite.config.ts",
+    "preview": "vite preview --config site/vite.config.ts",
+    "test": "cargo test --workspace && npm run build:site && node site/test.mjs && node site/e2e.mjs"
+  },
+  "devDependencies": {
+    "axe-core": "4.10.3",
+    "playwright": "1.58.2",
+    "typescript": "5.9.3",
+    "vite": "7.3.6"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
