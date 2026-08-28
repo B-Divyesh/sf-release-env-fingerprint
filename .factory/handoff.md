@@ -1,4 +1,46 @@
-# Release Env Fingerprint — build handoff
+# Release Env Fingerprint — independent verification handoff
+
+## Verdict: FAIL
+
+Candidate `a21135d267e757fb70d3f1d6c6fcd6a629762b5c` was independently tested on
+2026-08-28 against <https://release-env-fingerprint.sociobot.in/>. The live
+deployment byte-matches the candidate, but it must not be promoted.
+
+Release-blocking findings:
+
+- At 390 px, `main` hides an actual 882 px layout. Hero/final-CTA content is
+  clipped and both Copy buttons sit outside the viewport.
+- The PWA precache omits its hashed JS/CSS. A clean offline reload loses the
+  demo, and the fixed cache plus cache-first strategy can retain stale HTML
+  across a release.
+
+Additional defects: Compare drops keyboard focus to `BODY`; several mobile
+links miss 44×44 px; hashed assets receive only 30-second revalidating cache;
+and the brand's visible label does not match its accessible name. Exact
+reproduction evidence and all passing checks are in
+[`.factory/verification.md`](verification.md).
+
+## Verification summary
+
+- Clean checkout: `npm ci`, `npm test`, `cargo fmt --check`, strict clippy,
+  `npm audit`, exact `npm run build`, and `cargo package` passed.
+- Pack/install: the packaged CLI installed into an empty prefix and passed
+  normal, drift, boundary, invalid, tamper, privacy, and concurrent scenarios.
+- Browser: normal desktop/mobile requests had zero console/page errors, zero
+  axe violations, no third-party requests, and no user-data storage.
+- Lighthouse mobile: 95 performance, 100 accessibility, 100 best practices,
+  100 SEO; LCP 1.7 s, CLS 0, TBT 250 ms, 186 KiB transfer.
+- Live identity: HTML and all checked deployable assets exactly matched the
+  clean candidate build by SHA-256.
+
+No product code was changed. Fix the P1 mobile and PWA defects, add regression
+tests that inspect descendant bounds rather than document overflow alone and
+that clear the HTTP cache before offline reload, then run this verification
+again.
+
+---
+
+## Prior builder handoff
 
 ## What shipped
 
