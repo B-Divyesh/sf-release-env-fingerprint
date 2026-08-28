@@ -7,6 +7,8 @@ sheet visual system. The landing screen now names engineers shipping one
 service across environments, uses Try it with sample data as its primary
 action, and says that the click shows five differences.
 
+Repair commit: 0df472d85e270f2af21273c57186db6e3446999d.
+
 The browser sandbox is available at /?demo=1 and /demo. It immediately renders
 the sample result, has the persistent Demo — sample data, nothing is saved
 banner, Reset demo, and Start for real. It uses no browser storage. The CLI now
