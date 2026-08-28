@@ -1,55 +1,70 @@
-# Release Env Fingerprint — adversarial review handoff
+# Release Env Fingerprint repair handoff
 
 ## Outcome
 
-Work order `release-env-fingerprint-review-1` is complete at source commit
-`6ac5933fe60d3bb0862a15f477bf73a57c51045a`. The verdict is **FAIL**. The full
-first-read, copy, demo, claims, structure, accessibility, and routing evidence
-is in `.factory/review-1.md`.
+Repair round 1 resolves B1–B4 from review-1 while keeping the risograph proof
+sheet visual system. The landing screen now names engineers shipping one
+service across environments, uses Try it with sample data as its primary
+action, and says that the click shows five differences.
 
-No product code was changed. This handoff and the new review are the only
-tracked changes.
+The browser sandbox is available at /?demo=1 and /demo. It immediately renders
+the sample result, has the persistent Demo — sample data, nothing is saved
+banner, Reset demo, and Start for real. It uses no browser storage. The CLI now
+ships examples and implements refp demo with a new temporary workspace and the
+real capture/compare flow.
 
-## Blocking findings
+The static site has browser-routed /demo, /privacy, /terms, and designed 404
+experiences; per-route title, description, canonical, focus/announcement,
+legal links, sitemap entries, social card, apple icon, and platform 404
+response override are present.
 
-1. The first screen does not name the intended user or provide one clear
-   “Try it with sample data” action.
-2. The CLI has no `demo` command, bundled `examples/`, isolated demo flow,
-   persistent banner, reset, or start-for-real path.
-3. The required `.factory/claims.json` is absent; all public claims are
-   unlisted and have no one-claim/one-test mapping.
-4. `/demo`, `/privacy`, `/terms`, and unknown paths all return the home page
-   with HTTP 200 and the home title; there is no real routing or designed 404.
+## Verification
 
-## Verification performed
+Run in this repair workspace:
 
-- Opened the live site cold in fresh Chromium contexts at 390 × 844 and
-  1440 × 900 and recorded the unscrolled copy and controls.
-- Exercised the seeded browser comparison, clear/reload behavior, browser
-  storage, same-origin request boundary, service worker, and offline reload.
-- Ran `refp demo` and `refp --demo` in an empty temporary directory; both were
-  rejected with exit 2 and created no files.
-- Cloned the reviewed commit to `/tmp/refp-review-clone-4DmMH0/repo`, then ran
-  `npm ci && npm test`; all Rust, site, and browser tests passed.
-- Ran `/opt/fleet/lib/verify-url.sh` against the live URL; it passed and found
-  no console errors.
-- Ran `npx @axe-core/cli` with matching Chrome/ChromeDriver 145; it reported
-  zero violations.
-- Crawled all landing links. Hash targets exist and the external source link
-  returned 200, but required policy/demo routes do not exist.
-- Probed root, required routes, and a random missing path; all returned the
-  home page with status 200.
+    npm ci
+    npm test
+    npm run lint
+    npm run build
+    cargo package --manifest-path cli/Cargo.toml --allow-dirty
 
-## Positive evidence retained
+Results:
 
-The core seeded comparison works, offline reload works after the first visit,
-no demo input reached cross-origin requests or persistent user-data stores,
-the clean-clone suite passes, and the risograph proof-sheet identity is
-distinct. These passes do not resolve the four release blockers.
+- npm test passed: TypeScript, 6 Rust tests, Vite/static budgets, browser
+  routes/demo/mobile/privacy/offline/keyboard/console checks, and Playwright
+  axe serious/critical check.
+- Initial assets: JavaScript 14,273 B, CSS 15,986 B, hero 178,612 B.
+- All ten registered claim commands passed:
+  sample-differences, signed-fingerprints, no-raw-values,
+  browser-demo-private, offline-reload, mit-license, cli-demo-isolated,
+  exit-2-difference, policy-rules, and approved-value-hashes.
+- npm run lint passed with rustfmt and clippy warnings denied.
+- npm run build completed with target/release/refp and dist/site.
+- cargo package completed with allow-dirty for the release-ready package check.
+- verify-url.sh against the local preview returned HTTP 200 with no console
+  errors, title, lang, one h1, main landmark, and no missing image alt.
+- Playwright axe integration found no serious or critical violations. The
+  standalone axe CLI was also invoked but its Selenium runner could not locate
+  a Chrome binary in this container; this is an environment limitation, not a
+  product failure.
 
-## Next steps
+## Demo and claims
 
-Implement the four blocking fixes in review order, then add and run every
-tagged claim test from a fresh clone. Re-run the same cold mobile/desktop,
-CLI-demo, route, link, offline/privacy, and accessibility checks before seeking
-a new verdict.
+See .factory/demo.md for sandbox behavior and .factory/claims.json for the
+one-test-per-claim commands. The browser privacy test checks same-origin
+requests plus cookies, localStorage, sessionStorage, and IndexedDB from a
+fresh context. The offline claim starts fresh, installs the service worker,
+then reloads offline and observes the completed sample comparison.
+
+## Release and deployment
+
+The static deployment artifact is dist/site. Push the repair commit on main;
+the work order static deployment consumes that artifact configuration. No
+secrets, DNS, billing, package publishing, or other infrastructure was
+changed.
+
+## Known gaps
+
+None in the product acceptance scope. The CLI demo leaves its temporary sample
+directory in place intentionally and prints its exact path so the visitor can
+inspect or remove it.

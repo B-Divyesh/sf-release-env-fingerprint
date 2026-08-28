@@ -1,0 +1,10 @@
+version = 1
+required_names = ["DATABASE_URL", "NODE_ENV"]
+required_prefixes = ["PUBLIC_"]
+
+[non_secret]
+names = ["NODE_ENV", "PUBLIC_API_ORIGIN"]
+prefixes = []
+
+[hosts]
+PUBLIC_API_ORIGIN = ["api.example.com"]

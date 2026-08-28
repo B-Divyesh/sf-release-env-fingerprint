@@ -3,4 +3,7 @@
   <url>
     <loc>https://release-env-fingerprint.sociobot.in/</loc>
   </url>
+  <url><loc>https://release-env-fingerprint.sociobot.in/demo</loc></url>
+  <url><loc>https://release-env-fingerprint.sociobot.in/privacy</loc></url>
+  <url><loc>https://release-env-fingerprint.sociobot.in/terms</loc></url>
 </urlset>

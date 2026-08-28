@@ -8,6 +8,7 @@ use serde_json::json;
 use std::fs;
 use std::path::PathBuf;
 use std::process::{Command, ExitCode};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Parser)]
 #[command(
@@ -28,6 +29,8 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Run an isolated comparison using the bundled sample files
+    Demo,
     /// Create a project signing key and starter policy
     Init(InitArgs),
     /// Run an approved command and write a signed fingerprint
@@ -97,10 +100,92 @@ fn main() -> ExitCode {
 
 fn run(cli: &Cli) -> Result<u8, String> {
     match &cli.command {
+        Commands::Demo => demo(cli.json),
         Commands::Init(args) => init(args, cli.json),
         Commands::Capture(args) => capture(args, cli.json),
         Commands::Compare(args) => compare_command(args, cli.json),
     }
+}
+
+/// Create a disposable sample workspace and run the same capture/compare code
+/// used by a project.  This intentionally does not inspect the current
+/// directory or any project configuration.
+fn demo(json_output: bool) -> Result<u8, String> {
+    let nonce = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|error| format!("could not create demo timestamp: {error}"))?
+        .as_nanos();
+    let directory = std::env::temp_dir().join(format!("refp-demo-{}-{nonce}", std::process::id()));
+    fs::create_dir_all(&directory).map_err(|error| {
+        format!(
+            "could not create demo directory {}: {error}",
+            directory.display()
+        )
+    })?;
+
+    let key_path = directory.join("demo.key");
+    let policy_path = directory.join("refp.toml");
+    let baseline_source = directory.join("baseline.env");
+    let candidate_source = directory.join("candidate.env");
+    let baseline = directory.join("baseline.refp.json");
+    let candidate = directory.join("candidate.refp.json");
+
+    write_private(
+        &key_path,
+        format!("{}\n", encode_key(&generate_key())).as_bytes(),
+        false,
+    )?;
+    write_private(
+        &policy_path,
+        include_str!("../../examples/refp.toml").as_bytes(),
+        false,
+    )?;
+    write_private(
+        &baseline_source,
+        include_str!("../../examples/baseline.env").as_bytes(),
+        false,
+    )?;
+    write_private(
+        &candidate_source,
+        include_str!("../../examples/candidate.env").as_bytes(),
+        false,
+    )?;
+
+    let baseline_args = CaptureArgs {
+        environment: "production".to_string(),
+        key: key_path.clone(),
+        policy: policy_path.clone(),
+        output: baseline.clone(),
+        command: vec!["cat".to_string(), baseline_source.display().to_string()],
+    };
+    let candidate_args = CaptureArgs {
+        environment: "candidate".to_string(),
+        key: key_path.clone(),
+        policy: policy_path.clone(),
+        output: candidate.clone(),
+        command: vec!["cat".to_string(), candidate_source.display().to_string()],
+    };
+    // These are the real capture and compare functions, not a mock report.
+    let _ = capture(&baseline_args, false)?;
+    let _ = capture(&candidate_args, false)?;
+    let report_code = compare_command(
+        &CompareArgs {
+            key: key_path,
+            baseline,
+            candidate,
+        },
+        json_output,
+    )?;
+    if json_output {
+        println!(
+            "{}",
+            json!({"demo": true, "directory": directory, "exit_code": report_code})
+        );
+    } else {
+        println!("Demo files remain at {}", directory.display());
+        println!("This sample is isolated from your project files.");
+    }
+    Ok(report_code)
 }
 
 fn init(args: &InitArgs, json_output: bool) -> Result<u8, String> {

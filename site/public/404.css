@@ -1,0 +1,4 @@
+body { margin: 0; padding: 10vh 6vw; color: #191a18; background: #f3ebd8; font: 18px/1.5 ui-monospace, monospace; }
+main { max-width: 44rem; padding: 2rem; border: 2px solid #191a18; background: #fff9ea; box-shadow: 10px 10px 0 #145a68, 16px 16px 0 #b22e2e; }
+h1 { margin: .4rem 0 1rem; font: 900 clamp(2.2rem, 7vw, 4.5rem)/.96 Arial Black, sans-serif; text-transform: uppercase; }
+a { display: inline-block; min-height: 44px; padding: 10px 14px; color: #fff9ea; background: #145a68; font-weight: 700; }

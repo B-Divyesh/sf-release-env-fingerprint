@@ -1,152 +1,71 @@
 # Release Env Fingerprint
 
-Release Env Fingerprint (`refp`) catches configuration drift between local,
-CI, staging, and production without writing environment values into an
-artifact. It is for engineers who need to prove that configuration shape and
-explicitly safe invariants match before deployment.
+Compare release configuration without exposing secrets. It is for engineers
+shipping one service through several environments.
 
-The project is deliberately not a secret manager. It runs an environment
-export command you explicitly provide, keeps values in memory only, records
-names and inferred types, and signs the resulting fingerprint with a
-project-local key. Only values named in the policy's `non_secret` allowlist may
-produce a keyed hash.
+Open the one-click browser sample:
 
-Live documentation: <https://release-env-fingerprint.sociobot.in>
+https://release-env-fingerprint.sociobot.in/?demo=1
 
-## Install
+## Install the CLI
 
-Install the single Rust binary directly from the repository:
+    cargo install --git https://github.com/B-Divyesh/sf-release-env-fingerprint --bin refp
+    refp --help
 
-```sh
-cargo install --git https://github.com/B-Divyesh/sf-release-env-fingerprint --bin refp
-refp --help
-```
+From a local clone:
 
-From a local clone, use `cargo install --path cli` instead.
+    cargo install --path cli
 
-The first tagged release will also publish prebuilt binaries. No registry
-package is published by this repository worker.
+## Try the bundled sample
 
-## Usage
+    refp demo
 
-Create a project key and starter policy. Keep `.refp-key` in your CI secret
-store and out of version control.
+The command creates a fresh temporary directory, copies the shipped sample
+files, captures both fingerprints, and compares them. It never reads your
+current project directory. The sample exits 2 because it contains five
+differences. The command prints the temporary directory path.
 
-```sh
-refp init --key .refp-key --policy refp.toml
-```
+## Compare your release configuration
 
-Capture a fingerprint from an approved command. The command must emit
-`NAME=VALUE` records separated by newlines or NUL bytes. `env -0` is preferred
-because it safely handles embedded newlines.
+    refp init --key .refp-key --policy refp.toml
+    refp capture --environment staging --key .refp-key --policy refp.toml --output staging.refp.json -- env -0
+    refp compare --key .refp-key --baseline production.refp.json staging.refp.json
 
-```sh
-refp capture \
-  --environment staging \
-  --key .refp-key \
-  --policy refp.toml \
-  --output staging.refp.json \
-  -- env -0
-```
+Use a policy to name required variables and approved non-secret values. The
+CLI signs every fingerprint. Fingerprints do not record raw environment values.
 
-Run the same capture in another execution context, then compare both signed
-artifacts:
+## Product promises and tests
 
-```sh
-refp compare \
-  --key .refp-key \
-  --baseline production.refp.json \
-  staging.refp.json
-```
+- The bundled sample reports five differences. @claim:sample-differences
+- Fingerprints are signed. @claim:signed-fingerprints
+- Fingerprints do not record raw environment values. @claim:no-raw-values
+- Browser demo sample data is not saved. @claim:browser-demo-private
+- The browser sample works offline after the first visit. @claim:offline-reload
+- The project is free under the MIT License. @claim:mit-license
 
-Use `--json` on `init`, `capture`, or `compare` for stable machine-readable
-output. Exit codes are `0` for success/no drift, `2` for valid fingerprints
-with drift or policy violations, and `1` for command, input, or signature
-errors.
+The claim registry is .factory/claims.json. Run one claim with:
 
-### Policy
+    npm run test:claims -- @claim:sample-differences
 
-`refp init` writes a documented starter file:
+## Develop and verify
 
-```toml
-version = 1
-required_names = ["DATABASE_URL", "NODE_ENV"]
-required_prefixes = ["PUBLIC_"]
+    npm ci
+    npm test
+    npm run lint
+    npm run build
 
-[non_secret]
-names = ["NODE_ENV", "PUBLIC_API_ORIGIN"]
-prefixes = []
+The build writes the static site to dist/site. Preview the site with:
 
-[hosts]
-PUBLIC_API_ORIGIN = ["api.example.com", ".example.internal"]
-```
+    npm run dev
 
-- `required_names` requires exact variable names.
-- `required_prefixes` requires at least one variable for each prefix.
-- `non_secret` is an explicit allowlist. Only matching variables receive a
-  keyed value hash, so a compare can detect safely resolved-value changes.
-- `hosts` maps a variable name to exact hosts or dot-prefixed subdomain
-  suffixes. Host checks run in memory; the URL itself is never stored.
+Create the package without publishing it:
 
-Each fingerprint contains the environment label, capture time, policy digest,
-variable names/types/presence, optional allowlisted hashes, policy violations,
-and an HMAC-SHA-256 signature. It never contains the project key or raw values.
-
-### GitHub Actions
-
-```yaml
-- name: Build refp
-  run: cargo install --path cli
-- name: Capture release environment
-  env:
-    REFP_KEY_B64: ${{ secrets.REFP_KEY_B64 }}
-  run: |
-    printf '%s' "$REFP_KEY_B64" > .refp-key
-    chmod 600 .refp-key
-    refp capture --environment github-hosted --key .refp-key \
-      --policy refp.toml --output ci.refp.json -- env -0
-- name: Compare with expected release shape
-  run: refp compare --key .refp-key --baseline expected.refp.json ci.refp.json
-```
-
-Do not pass a shell pipeline as the capture command. Arguments after `--` are
-executed directly, without a shell, which keeps the approval boundary visible.
-
-## Develop
-
-Requirements: Rust 1.79+ and Node.js 20+.
-
-```sh
-npm ci
-npm test
-npm run typecheck
-npm run lint
-npm run build
-```
-
-`npm test` runs TypeScript checking, Rust unit/integration tests, static site
-budgets, and the browser regression suite (including mobile bounds and a cold
-offline reload after the browser HTTP cache is cleared).
-`npm run build` builds the release CLI and the static site. The deployable site
-is written to `dist/site/` with `index.html` at that root. For local site work:
-
-```sh
-npm run dev
-npm run build:site
-```
-
-Create a registry-ready Rust package without publishing it:
-
-```sh
-cargo package --manifest-path cli/Cargo.toml
-```
+    cargo package --manifest-path cli/Cargo.toml
 
 ## Privacy and security
 
-`refp` has no telemetry, network calls, account, or cloud dependency. Treat the
-project key like a CI secret. Fingerprints intentionally disclose environment
-variable names and coarse inferred types; review them before publishing. See
-[SECURITY.md](SECURITY.md) for the threat model and reporting guidance.
+Review a fingerprint before sharing it because it includes variable names and
+inferred types. See SECURITY.md for the threat model.
 
 ## License
 

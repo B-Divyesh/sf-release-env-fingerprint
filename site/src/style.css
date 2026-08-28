@@ -68,6 +68,8 @@ h2 { font-size: clamp(36px, 4.4vw, 58px); text-transform: uppercase; }
 h3 { font-size: 25px; text-transform: uppercase; }
 .lede { max-width: 61ch; margin: 26px 0 30px; font-size: 18px; color: #343631; }
 .hero-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.hero-button { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.action-note { margin: 0; color: var(--muted); font-size: 14px; }
 .command-box { width: 100%; max-width: 500px; min-width: 0; min-height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-left: 16px; border: 2px solid var(--ink); background: var(--paper-high); box-shadow: 6px 6px 0 var(--ink); }
 .command-box code { min-width: 0; flex: 1 1 auto; overflow-x: auto; white-space: nowrap; font-size: 14px; }
 .copy-button { flex: 0 0 auto; align-self: stretch; min-width: 88px; min-height: 52px; border: 0; border-left: 2px solid var(--ink); color: var(--paper-high); background: var(--blue); cursor: pointer; font-weight: 700; }
@@ -105,6 +107,11 @@ h3 { font-size: 25px; text-transform: uppercase; }
 .demo-section .eyebrow, .demo-section .section-heading > p:last-child { color: #e3ddc9; }
 .demo-section .eyebrow span { color: var(--ink); background: #e89d40; }
 .demo-section code { color: inherit; }
+.demo-banner { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: -24px 0 28px; padding: 14px 16px; border: 2px solid var(--ink); color: var(--ink); background: #e89d40; box-shadow: 5px 5px 0 var(--ink); }
+.demo-banner strong { font-family: var(--display); text-transform: uppercase; }
+.demo-banner span { flex: 1 1 230px; font-size: 13px; }
+.demo-banner button, .demo-banner a { min-height: 44px; padding: 9px 12px; border: 2px solid var(--ink); color: var(--paper-high); background: var(--ink); font-weight: 800; text-decoration: none; cursor: pointer; }
+.demo-banner a { color: var(--ink); background: var(--paper); }
 .offline-notice { margin: -24px 0 28px; padding: 12px 16px; border: 2px solid #e89d40; background: var(--ink); }
 .demo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
 .input-sheet { position: relative; padding: 20px; color: var(--ink); border: 2px solid var(--ink); background: var(--paper); box-shadow: 7px 7px 0 var(--ink); }
@@ -117,7 +124,7 @@ textarea { width: 100%; min-height: 234px; resize: vertical; display: block; pad
 .primary-button, .secondary-button { min-height: 48px; padding: 10px 18px; border: 2px solid var(--ink); cursor: pointer; font-weight: 800; }
 .primary-button { color: var(--ink); background: #e89d40; box-shadow: 5px 5px 0 var(--ink); }
 .primary-button:disabled { cursor: wait; opacity: 0.75; }
-.secondary-button { color: var(--paper-high); background: transparent; border-color: var(--paper-high); }
+.secondary-button { display: inline-flex; align-items: center; justify-content: center; color: var(--paper-high); background: transparent; border-color: var(--paper-high); text-decoration: none; }
 .demo-actions p { margin: 0 0 0 auto; font-size: 13px; }
 .demo-actions p span { color: #8fd19e; }
 .demo-output { min-height: 124px; border: 2px solid var(--ink); color: var(--ink); background: var(--paper-high); box-shadow: 8px 8px 0 var(--ink); }
@@ -183,6 +190,12 @@ footer nav { display: flex; gap: 16px; }
 footer a { min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; color: var(--paper-high); }
 footer p { max-width: 70ch; margin: 0; }
 footer > p:last-child { grid-column: 2; grid-row: 2; }
+.legal-page { min-height: 64vh; padding: 96px 24px; }
+.legal-sheet { max-width: 760px; margin: 0 auto; padding: 40px; border: 2px solid var(--ink); background: var(--paper-high); box-shadow: 10px 10px 0 var(--blue), 16px 16px 0 var(--red); }
+.legal-sheet h1 { margin-bottom: 28px; font-size: clamp(40px, 6vw, 66px); text-transform: uppercase; }
+.legal-sheet p { max-width: 65ch; font-size: 17px; }
+.not-found { box-shadow: 10px 10px 0 var(--red); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 @media (max-width: 900px) {
   .site-header nav a:not(.nav-install) { display: none; }
@@ -214,6 +227,8 @@ footer > p:last-child { grid-column: 2; grid-row: 2; }
   .trust-strip { align-items: flex-start; }
   .trust-strip ul { display: grid; gap: 6px; font-size: 13px; }
   .section, .demo-section { padding: 76px 20px; }
+  .demo-banner { align-items: flex-start; margin-top: -14px; }
+  .demo-banner button, .demo-banner a { flex: 1 1 132px; }
   .demo-grid { grid-template-columns: 1fr; }
   .candidate-sheet { transform: none; }
   .demo-actions { align-items: stretch; }
@@ -226,6 +241,8 @@ footer > p:last-child { grid-column: 2; grid-row: 2; }
   .exit-codes { grid-template-columns: 1fr; }
   .exit-codes div { min-height: 88px; }
   .final-cta { padding: 64px 20px; gap: 34px; }
+  .legal-page { padding: 64px 20px; }
+  .legal-sheet { padding: 28px 20px; box-shadow: 7px 7px 0 var(--blue), 12px 12px 0 var(--red); }
   footer { grid-template-columns: 1fr; padding: 44px 20px; }
   footer nav { grid-row: auto; }
   footer > p:last-child { grid-column: auto; grid-row: auto; }

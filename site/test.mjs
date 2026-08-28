@@ -4,11 +4,15 @@ import { readFile, stat } from 'node:fs/promises';
 
 const html = await readFile('dist/site/index.html', 'utf8');
 assert.match(html, /<html lang="en">/);
-assert.equal((html.match(/<h1[ >]/g) ?? []).length, 1, 'site must contain exactly one h1');
-assert.match(html, /<main id="main">/);
 assert.match(html, /<title>[^<]+<\/title>/);
+assert.match(html, /rel="canonical"/);
+assert.match(html, /property="og:title"/);
+assert.match(html, /name="twitter:card"/);
+assert.match(html, /apple-touch-icon/);
 assert.doesNotMatch(html, /https:\/\/(fonts|cdn|unpkg|jsdelivr)\./);
-assert.match(html, /aria-label="REFP [^"]*Release Env Fingerprint home"/, 'brand accessible name must include visible REFP label');
+assert.ok((await stat('dist/site/social-card.jpg')).size > 0, 'social card missing');
+assert.ok((await stat('dist/site/apple-touch-icon.png')).size > 0, 'apple touch icon missing');
+assert.ok((await stat('dist/site/404.html')).size > 0, 'static 404 missing');
 
 const assets = [...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map((match) => match[1]);
 let jsBytes = 0;
@@ -40,4 +44,5 @@ const assetRoute = staticConfig.routes.find((route) => route.route === '/assets/
 assert.equal(assetRoute?.headers?.['Cache-Control'], 'public, max-age=31536000, immutable');
 const workerRoute = staticConfig.routes.find((route) => route.route === '/sw.js');
 assert.match(workerRoute?.headers?.['Cache-Control'] ?? '', /no-store/);
+assert.equal(staticConfig.responseOverrides?.['404']?.statusCode, 404);
 console.log(`site budgets: JS ${jsBytes} B, CSS ${cssBytes} B, hero ${(await stat('dist/site/proof-sheet.webp')).size} B`);

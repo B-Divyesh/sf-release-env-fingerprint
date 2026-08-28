@@ -29,6 +29,12 @@
     "rewrite": "/index.html",
     "exclude": ["/assets/*", "/*.webp", "/*.svg", "/*.js", "/*.webmanifest"]
   },
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/404.html",
+      "statusCode": 404
+    }
+  },
   "globalHeaders": {
     "X-Content-Type-Options": "nosniff",
     "Referrer-Policy": "no-referrer",

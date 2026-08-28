@@ -1,0 +1,1 @@
+Compare release configuration without exposing secrets before deployment.

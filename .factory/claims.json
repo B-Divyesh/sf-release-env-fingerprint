@@ -1,0 +1,72 @@
+[
+  {
+    "id": "sample-differences",
+    "claim": "The sample shows five configuration differences.",
+    "where": "landing action, demo",
+    "test": "npm run test:claims -- @claim:sample-differences",
+    "sandbox": "fresh CLI process running refp demo with shipped examples"
+  },
+  {
+    "id": "signed-fingerprints",
+    "claim": "Fingerprints are signed.",
+    "where": "README",
+    "test": "npm run test:claims -- @claim:signed-fingerprints",
+    "sandbox": "tamper a captured fingerprint and verify rejection"
+  },
+  {
+    "id": "no-raw-values",
+    "claim": "Fingerprints do not record raw environment values.",
+    "where": "README, workflow",
+    "test": "npm run test:claims -- @claim:no-raw-values",
+    "sandbox": "capture sentinel secrets and scan the fingerprint"
+  },
+  {
+    "id": "browser-demo-private",
+    "claim": "Demo sample data is not saved or sent to another origin.",
+    "where": "landing fact, demo banner, privacy",
+    "test": "npm run test:claims -- @claim:browser-demo-private",
+    "sandbox": "fresh browser context; inspect requests, cookies, local/session storage, and IndexedDB"
+  },
+  {
+    "id": "offline-reload",
+    "claim": "Works offline after the first visit.",
+    "where": "landing fact, offline notice",
+    "test": "npm run test:claims -- @claim:offline-reload",
+    "sandbox": "fresh browser context; first visit, service worker control, offline reload, sample result"
+  },
+  {
+    "id": "mit-license",
+    "claim": "Free under the MIT License.",
+    "where": "landing fact, terms",
+    "test": "npm run test:claims -- @claim:mit-license",
+    "sandbox": "inspect the shipped LICENSE file"
+  },
+  {
+    "id": "cli-demo-isolated",
+    "claim": "refp demo creates an isolated temporary sample workspace.",
+    "where": "README, CLI sample section, demo documentation",
+    "test": "npm run test:claims -- @claim:cli-demo-isolated",
+    "sandbox": "fresh CLI process; inspect printed temporary directory and isolation notice"
+  },
+  {
+    "id": "exit-2-difference",
+    "claim": "The CLI exits 2 when fingerprints differ.",
+    "where": "workflow, README",
+    "test": "npm run test:claims -- @claim:exit-2-difference",
+    "sandbox": "run the shipped sample with known differences"
+  },
+  {
+    "id": "policy-rules",
+    "claim": "The policy enforces required variables and host rules.",
+    "where": "configuration policy section",
+    "test": "npm run test:claims -- @claim:policy-rules",
+    "sandbox": "unit fixture with a missing required name and disallowed host"
+  },
+  {
+    "id": "approved-value-hashes",
+    "claim": "Only approved non-secret values receive a keyed hash.",
+    "where": "configuration policy section, README",
+    "test": "npm run test:claims -- @claim:approved-value-hashes",
+    "sandbox": "policy fixture verifies allowlisted value changes without raw values"
+  }
+]

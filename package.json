@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "cargo fmt --all -- --check && cargo clippy --workspace --all-targets -- -D warnings",
     "preview": "vite preview --config site/vite.config.ts",
-    "test": "npm run typecheck && cargo test --workspace && npm run build:site && node site/test.mjs && node site/e2e.mjs"
+    "test": "npm run typecheck && cargo test --workspace && npm run build:site && node site/test.mjs && node site/e2e.mjs",
+    "test:claims": "node site/claims.mjs"
   },
   "devDependencies": {
     "@types/node": "24.3.0",
