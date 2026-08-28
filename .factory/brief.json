@@ -1,0 +1,11 @@
+{
+  "slug": "release-env-fingerprint",
+  "title": "Release Env Fingerprint",
+  "territory": "devtools-data",
+  "user": "Engineers shipping the same service through local, CI, staging, and production environments who need to find missing, extra, or differently resolved configuration without revealing values.",
+  "smallest_useful_product": "A CLI that captures a name/type/presence fingerprint from an approved command, compares signed fingerprints by environment, and enforces rules such as required prefixes, endpoint host allowlists, and value hashes for explicitly non-secret values.",
+  "artifact_class": "cli",
+  "monetization": "free",
+  "constraints": "Never persist raw environment values; salt hashes per project; explicitly classify allowlisted non-secrets; support POSIX shell and GitHub Actions first.",
+  "state": "RESEARCHED"
+}
