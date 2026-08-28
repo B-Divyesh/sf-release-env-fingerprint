@@ -7,7 +7,8 @@ sheet visual system. The landing screen now names engineers shipping one
 service across environments, uses Try it with sample data as its primary
 action, and says that the click shows five differences.
 
-Repair commit: 0df472d85e270f2af21273c57186db6e3446999d.
+Repair implementation commit: 0df472d85e270f2af21273c57186db6e3446999d.
+Published-package sample repair: ef3761ef6fa904513227799b6cde05b9e935ead2.
 
 The browser sandbox is available at /?demo=1 and /demo. It immediately renders
 the sample result, has the persistent Demo — sample data, nothing is saved
@@ -43,6 +44,7 @@ Results:
 - npm run lint passed with rustfmt and clippy warnings denied.
 - npm run build completed with target/release/refp and dist/site.
 - cargo package completed with allow-dirty for the release-ready package check.
+- A fresh shallow clone of pushed main ran npm ci and npm test successfully.
 - verify-url.sh against the local preview returned HTTP 200 with no console
   errors, title, lang, one h1, main landmark, and no missing image alt.
 - Playwright axe integration found no serious or critical violations. The
