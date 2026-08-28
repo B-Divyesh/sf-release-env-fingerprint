@@ -137,17 +137,17 @@ fn demo(json_output: bool) -> Result<u8, String> {
     )?;
     write_private(
         &policy_path,
-        include_str!("../../examples/refp.toml").as_bytes(),
+        include_str!("../examples/refp.toml").as_bytes(),
         false,
     )?;
     write_private(
         &baseline_source,
-        include_str!("../../examples/baseline.env").as_bytes(),
+        include_str!("../examples/baseline.env").as_bytes(),
         false,
     )?;
     write_private(
         &candidate_source,
-        include_str!("../../examples/candidate.env").as_bytes(),
+        include_str!("../examples/candidate.env").as_bytes(),
         false,
     )?;
 

@@ -12,7 +12,7 @@ site shell. Demo mode is selected by ?demo=1; it has no shared storage
 namespace because no browser storage is used.
 
 CLI demo: run refp demo. It creates a new refp-demo-* directory in the
-operating system temporary directory, copies the examples baseline, candidate,
-and policy files, then invokes the normal capture and compare functions. It
+operating system temporary directory, copies the CLI examples baseline,
+candidate, and policy files, then invokes the normal capture and compare functions. It
 does not inspect the current directory or write project files. The command
 prints the directory path; remove that temporary directory when done.
