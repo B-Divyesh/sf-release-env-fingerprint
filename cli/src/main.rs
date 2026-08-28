@@ -113,7 +113,9 @@ fn init(args: &InitArgs, json_output: bool) -> Result<u8, String> {
     let key = encode_key(&generate_key());
     write_private(&args.key, format!("{key}\n").as_bytes(), args.force)?;
     if let Err(error) = write_private(&args.policy, default_policy().as_bytes(), args.force) {
-        let _ = fs::remove_file(&args.key);
+        if !args.force {
+            let _ = fs::remove_file(&args.key);
+        }
         return Err(error);
     }
     if json_output {

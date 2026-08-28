@@ -464,14 +464,17 @@ fn evaluate_policy(values: &BTreeMap<String, Vec<u8>>, policy: &Policy) -> Vec<V
             .ok()
             .and_then(|text| Url::parse(text).ok());
         let host = parsed.as_ref().and_then(Url::host_str);
-        let allowed = host.is_some_and(|host| {
-            allowed_hosts.iter().any(|allowed| {
-                if allowed.starts_with('.') {
-                    host.ends_with(allowed) && host.len() > allowed.len()
-                } else {
-                    host.eq_ignore_ascii_case(allowed)
-                }
-            })
+        let allowed = parsed.as_ref().is_some_and(|url| {
+            matches!(url.scheme(), "http" | "https")
+                && host.is_some_and(|host| {
+                    allowed_hosts.iter().any(|allowed| {
+                        if allowed.starts_with('.') {
+                            host.ends_with(allowed) && host.len() > allowed.len()
+                        } else {
+                            host.eq_ignore_ascii_case(allowed)
+                        }
+                    })
+                })
         });
         if !allowed {
             violations.push(Violation {
