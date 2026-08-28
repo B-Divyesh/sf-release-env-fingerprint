@@ -69,3 +69,26 @@ the cold check.
 
 Known gaps: none. Registry publication and release tagging remain factory
 release operations, not product defects.
+
+## Review 3 handoff
+
+Independent adversarial review 3 passed at
+`e76591a146f6a4dfb8085b059ae7b8d867cbf678`. No product code was changed; the
+full record is in `.factory/review-3.md`.
+
+Fresh live Chromium sessions at 390 × 844 and 1440 × 900 checked the first
+screen, demo, direct routes, 404, metadata, link crawl, route focus/Back,
+storage, request boundary, and offline reload. A clean clone at
+`/tmp/refp-review3-clean-Dg7Y77/repo` ran `npm ci` and every entry in
+`.factory/claims.json` using `npm run test:claims:all`; all 18 passed.
+
+Re-run with:
+
+    npm ci
+    npm run test:claims:all
+    npm test
+    npm run lint
+    npm run build
+
+Known gaps from this review: none. Future public claims need an observable
+sandbox test before publication.
